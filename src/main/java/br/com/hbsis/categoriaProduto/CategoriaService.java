@@ -1,5 +1,5 @@
 package br.com.hbsis.categoriaProduto;
-
+import br.com.hbsis.fornecedor.FornecedorService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +13,13 @@ public class CategoriaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CategoriaService.class);
 
     private final CategoriaRepository categoriaRepository;
+    private final FornecedorService fornecedorService;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+
+    public CategoriaService(CategoriaRepository categoriaRepository, FornecedorService fornecedorService) {
         this.categoriaRepository = categoriaRepository;
+        this.fornecedorService = fornecedorService;
+
     }
 
     public CategoriaProdutoDTO save(CategoriaProdutoDTO categoriaProdutoDTO){
@@ -26,8 +30,8 @@ public class CategoriaService {
         LOGGER.debug("Categoria: {}", categoriaProdutoDTO);
 
         Categoria categoria = new Categoria();
-        categoria.setFornecedor_categoria(categoriaProdutoDTO.getFornecedor_categoria());
         categoria.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
+        categoria.setFornecedor(fornecedorService.findIdFornecedor(categoriaProdutoDTO.getId_fornecedor()));
 
         categoria = this.categoriaRepository.save(categoria);
 
@@ -37,7 +41,7 @@ public class CategoriaService {
     private void validate(CategoriaProdutoDTO categoriaProdutoDTO){
         LOGGER.info("Validando Categoria");
 
-        if(StringUtils.isEmpty(categoriaProdutoDTO.getFornecedor_categoria().toString())) {
+        if(StringUtils.isEmpty(categoriaProdutoDTO.getNome_categoria().toString())) {
             throw new IllegalArgumentException("Categoria não deve ser nula/vazia");
         }
     }
@@ -63,7 +67,7 @@ public class CategoriaService {
             LOGGER.debug("Categoria existente: {}", categoriaExistente);
 
             categoriaExistente.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
-            categoriaExistente.setFornecedor_categoria(categoriaProdutoDTO.getFornecedor_categoria());
+            categoriaExistente.setFornecedor(categoriaProdutoDTO.getId_fornecedor());
 
             categoriaExistente = this.categoriaRepository.save(categoriaExistente);
 

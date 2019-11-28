@@ -43,11 +43,23 @@ public class FornecedorService {
     }
 
     private void validate(FornecedorDTO fornecedorDTO){
-        LOGGER.info("Validando Fornecedor");
+            LOGGER.info("Validando Fornecedor");
 
-        if(StringUtils.isEmpty(fornecedorDTO.getCnpj())) {
-            throw new IllegalArgumentException("Fornecedor não deve ser nulo/vazio");
+            String cnpj = fornecedorDTO.getCnpj();
+
+            if(StringUtils.isEmpty(fornecedorDTO.getCnpj())) {
+                throw new IllegalArgumentException("Fornecedor não deve ser nulo/vazio");
+            }
+    }
+
+    public FornecedorDTO findIdFornecedor(Long Id){
+        Optional<Fornecedor> fornecedorOptional = this.fornecedorRepository.findById(Id);
+
+        if(fornecedorOptional.isPresent()){
+            return FornecedorDTO.of(fornecedorOptional.get());
         }
+
+        throw new IllegalArgumentException(String.format("Fornecedor não existe", Id));
     }
 
     public FornecedorDTO findById(Long Id){
@@ -59,6 +71,7 @@ public class FornecedorService {
 
         throw new IllegalArgumentException(String.format("ID %s não existe", Id));
     }
+
 
     public FornecedorDTO update(FornecedorDTO fornecedorDTO, Long Id) {
         Optional<Fornecedor> fornecedorExistenteOptional = this.fornecedorRepository.findById(Id);

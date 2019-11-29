@@ -1,6 +1,7 @@
 package br.com.hbsis.categoriaProduto;
 
 import br.com.hbsis.fornecedor.Fornecedor;
+import br.com.hbsis.fornecedor.FornecedorDTO;
 
 import javax.persistence.*;
 
@@ -14,18 +15,17 @@ public class Categoria {
     @Column(name = "nome_categoria", unique = false, length = 70)
     private String nome_categoria;
     @Column(name = "codigo", unique = true, length = 100)
-    private int codigo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fornecedor_categoria", referencedColumnName = "id")
+    private Long codigo;
+    @ManyToOne
+    @JoinColumn(name = "id_fornecedor", referencedColumnName = "id")
     private Fornecedor fornecedor;
 
 
-    public int getCodigo() {
+    public Long getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(int codigo) {
+    public void setCodigo(Long codigo) {
         this.codigo = codigo;
     }
 

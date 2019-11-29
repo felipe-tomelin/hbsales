@@ -4,7 +4,7 @@ package br.com.hbsis.fornecedor;
  * Classe para tráfego das informações do Fornecedor
  */
 
-public class FornecedorDTO {
+public class FornecedorDTO{
     private Long id;
     private String razaoSocial;
     private String cnpj;

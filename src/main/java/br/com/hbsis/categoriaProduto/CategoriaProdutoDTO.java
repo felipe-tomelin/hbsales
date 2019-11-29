@@ -1,17 +1,16 @@
 package br.com.hbsis.categoriaProduto;
 
-import br.com.hbsis.fornecedor.Fornecedor;
 
 public class CategoriaProdutoDTO {
     private Long id;
     private String nome_categoria;
     private Long id_fornecedor;
-    private int codigo;
+    private Long codigo;
 
     public CategoriaProdutoDTO(){
     }
 
-    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, int codigo){
+    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, Long codigo){
         this.id = id;
         this.nome_categoria = nome_categoria;
         this.id_fornecedor = id_fornecedor;
@@ -26,6 +25,15 @@ public class CategoriaProdutoDTO {
                 categoria.getFornecedor().getId(),
                 categoria.getCodigo()
         );
+    }
+
+
+    public Long getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(Long codigo) {
+        this.codigo = codigo;
     }
 
     public Long getId_fornecedor() {
@@ -57,6 +65,7 @@ public class CategoriaProdutoDTO {
         return "Categoria{" +
                 "id=" + id +
                 ", nome_categoria'" + nome_categoria + '\'' +
+                ", codigo'" + codigo + '\'' +
                 ", ID fornecedor'" + id_fornecedor + '\'' +
                 '}';
     }

@@ -1,4 +1,6 @@
 package br.com.hbsis.categoriaProduto;
+import br.com.hbsis.fornecedor.Fornecedor;
+import br.com.hbsis.fornecedor.FornecedorDTO;
 import br.com.hbsis.fornecedor.FornecedorService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -30,18 +32,32 @@ public class CategoriaService {
         LOGGER.debug("Categoria: {}", categoriaProdutoDTO);
 
         Categoria categoria = new Categoria();
+
         categoria.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
-        categoria.setFornecedor(fornecedorService.findIdFornecedor(categoriaProdutoDTO.getId_fornecedor()));
+        categoria.setCodigo(categoriaProdutoDTO.getCodigo());
+
+        FornecedorDTO fornecedorDTO = fornecedorService.findById(categoriaProdutoDTO.getId_fornecedor());
+        Fornecedor fornecedor = converter(fornecedorDTO);
+
+        categoria.setFornecedor(fornecedor);
 
         categoria = this.categoriaRepository.save(categoria);
 
         return categoriaProdutoDTO.of(categoria);
     }
 
+    public Fornecedor converter(FornecedorDTO fornecedorDTO){
+
+        Fornecedor fornecedor = new Fornecedor();
+
+        fornecedor.setId(fornecedorDTO.getId());
+        return fornecedor;
+    }
+
     private void validate(CategoriaProdutoDTO categoriaProdutoDTO){
         LOGGER.info("Validando Categoria");
 
-        if(StringUtils.isEmpty(categoriaProdutoDTO.getNome_categoria().toString())) {
+        if(StringUtils.isEmpty(categoriaProdutoDTO.getNome_categoria())) {
             throw new IllegalArgumentException("Categoria não deve ser nula/vazia");
         }
     }
@@ -67,7 +83,12 @@ public class CategoriaService {
             LOGGER.debug("Categoria existente: {}", categoriaExistente);
 
             categoriaExistente.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
-            categoriaExistente.setFornecedor(categoriaProdutoDTO.getId_fornecedor());
+            categoriaExistente.setCodigo(categoriaProdutoDTO.getCodigo());
+
+            FornecedorDTO fornecedorDTO = fornecedorService.findById(categoriaProdutoDTO.getId_fornecedor());
+            Fornecedor fornecedor = converter(fornecedorDTO);
+
+            categoriaExistente.setFornecedor(fornecedor);
 
             categoriaExistente = this.categoriaRepository.save(categoriaExistente);
 

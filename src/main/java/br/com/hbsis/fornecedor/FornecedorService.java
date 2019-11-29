@@ -52,16 +52,6 @@ public class FornecedorService {
             }
     }
 
-    public FornecedorDTO findIdFornecedor(Long Id){
-        Optional<Fornecedor> fornecedorOptional = this.fornecedorRepository.findById(Id);
-
-        if(fornecedorOptional.isPresent()){
-            return FornecedorDTO.of(fornecedorOptional.get());
-        }
-
-        throw new IllegalArgumentException(String.format("Fornecedor não existe", Id));
-    }
-
     public FornecedorDTO findById(Long Id){
         Optional<Fornecedor> fornecedorOptional = this.fornecedorRepository.findById(Id);
 

@@ -5,12 +5,12 @@ public class CategoriaProdutoDTO {
     private Long id;
     private String nome_categoria;
     private Long id_fornecedor;
-    private Long codigo;
+    private String codigo;
 
     public CategoriaProdutoDTO(){
     }
 
-    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, Long codigo){
+    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, String codigo){
         this.id = id;
         this.nome_categoria = nome_categoria;
         this.id_fornecedor = id_fornecedor;
@@ -28,11 +28,11 @@ public class CategoriaProdutoDTO {
     }
 
 
-    public Long getCodigo() {
+    public String getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(Long codigo) {
+    public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 

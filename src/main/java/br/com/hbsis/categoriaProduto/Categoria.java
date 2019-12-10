@@ -1,7 +1,6 @@
 package br.com.hbsis.categoriaProduto;
 
 import br.com.hbsis.fornecedor.Fornecedor;
-import br.com.hbsis.fornecedor.FornecedorDTO;
 
 import javax.persistence.*;
 
@@ -12,20 +11,20 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "nome_categoria", unique = false, length = 70)
+    @Column(name = "nome_categoria", length = 50)
     private String nome_categoria;
-    @Column(name = "codigo", unique = true, length = 100)
-    private Long codigo;
+    @Column(name = "codigo", unique = true, length = 10)
+    private String codigo;
     @ManyToOne
     @JoinColumn(name = "id_fornecedor", referencedColumnName = "id")
     private Fornecedor fornecedor;
 
 
-    public Long getCodigo() {
+    public String getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(Long codigo) {
+    public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 

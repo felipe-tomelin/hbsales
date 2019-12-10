@@ -17,9 +17,15 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>Hoxton.RC2</spring-cloud.version>
-    </properties>
+    </properties>s
 
     <dependencies>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -99,5 +105,8 @@
             <url>https://repo.spring.io/milestone</url>
         </repository>
     </repositories>
+
+
+
 
 </project>

@@ -10,13 +10,13 @@ public class FornecedorDTO{
     private String cnpj;
     private String nomeFantasia;
     private String endereco;
-    private int telefone;
+    private String telefone;
     private String email;
 
     public FornecedorDTO() {
     }
 
-    public FornecedorDTO(Long id, String RazaoSocial, String cnpj, String NomeFantasia, String Endereco, int Telefone, String Email){
+    public FornecedorDTO(Long id, String RazaoSocial, String cnpj, String NomeFantasia, String Endereco, String Telefone, String Email){
         this.id = id;
         this.razaoSocial = RazaoSocial;
         this.cnpj = cnpj;
@@ -30,7 +30,7 @@ public class FornecedorDTO{
         return new FornecedorDTO(
                 fornecedor.getId(),
                 fornecedor.getRazaoSocial(),
-                fornecedor.getCNPJ(),
+                fornecedor.getCnpj(),
                 fornecedor.getNomeFantasia(),
                 fornecedor.getEndereco(),
                 fornecedor.getTelefone(),
@@ -78,11 +78,11 @@ public class FornecedorDTO{
         this.endereco = endereco;
     }
 
-    public int getTelefone() {
+    public String getTelefone() {
         return telefone;
     }
 
-    public void setTelefone(int telefone) {
+    public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
 

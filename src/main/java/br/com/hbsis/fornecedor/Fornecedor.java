@@ -15,15 +15,15 @@ public class Fornecedor {
     private Long id;
     @Column(name = "razao_social", unique = true, nullable = false, length = 100)
     private String RazaoSocial;
-    @Column(name = "cnpj", unique = true, nullable = false, length = 18)
-    private String CNPJ;
-    @Column(name = "nome_fantasia", unique = true, nullable = false, length = 70)
+    @Column(name = "cnpj", unique = true, nullable = false, length = 14)
+    private String cnpj;
+    @Column(name = "nome_fantasia", unique = true, nullable = false, length = 100)
     private String NomeFantasia;
-    @Column(name = "endereco", unique = true, nullable = false, length = 70)
+    @Column(name = "endereco", unique = true, nullable = false, length = 100)
     private String Endereco;
-    @Column(name = "telefone", unique = true, nullable = false, length = 9)
-    private int Telefone;
-    @Column(name = "email", unique = true, nullable = false, length = 70)
+    @Column(name = "telefone", unique = true, nullable = false, length = 14)
+    private String Telefone;
+    @Column(name = "email", unique = true, nullable = false, length = 50)
     private String Email;
 
     public Long getId() {
@@ -38,12 +38,12 @@ public class Fornecedor {
         RazaoSocial = razaoSocial;
     }
 
-    public String getCNPJ() {
-        return CNPJ;
+    public String getCnpj() {
+        return cnpj;
     }
 
-    public void setCNPJ(String CNPJ) {
-        this.CNPJ = CNPJ;
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
     }
 
     public String getNomeFantasia() {
@@ -62,11 +62,11 @@ public class Fornecedor {
         Endereco = endereco;
     }
 
-    public int getTelefone() {
+    public String getTelefone() {
         return Telefone;
     }
 
-    public void setTelefone(int telefone) {
+    public void setTelefone(String telefone) {
         Telefone = telefone;
     }
 
@@ -88,7 +88,7 @@ public class Fornecedor {
         return "Fornecedor{" +
         "Id=" + id +
                 ", RazaoSocial='" + RazaoSocial + '\'' +
-                ", CNPJ='" + CNPJ + '\'' +
+                ", CNPJ='" + cnpj + '\'' +
                 ", Nome Fantasia='" + NomeFantasia + '\'' +
                 ", Endereço='" + Endereco + '\'' +
                 ", Telefone='" + Telefone + '\'' +

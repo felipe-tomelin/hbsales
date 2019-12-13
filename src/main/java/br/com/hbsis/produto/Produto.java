@@ -14,7 +14,7 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "codigo_produto", unique = true, length = 10)
-    private String codigo_produto;
+    private String codigoProduto;
     @Column(name = "nome_produto", length = 200)
     private String nome_produto;
     @Column(name = "preco_produto")
@@ -41,12 +41,12 @@ public class Produto {
         this.id = id;
     }
 
-    public String getCodigo_produto() {
-        return codigo_produto;
+    public String getCodigoProduto() {
+        return codigoProduto;
     }
 
-    public void setCodigo_produto(String codigo_produto) {
-        this.codigo_produto = codigo_produto;
+    public void setCodigoProduto(String codigoProduto) {
+        this.codigoProduto = codigoProduto;
     }
 
     public String getNome_produto() {
@@ -111,14 +111,14 @@ public class Produto {
     public String toString() {
         return "Produto{" +
                 "id=" + id +
-                ", codigo_produto=" + codigo_produto +
+                ", codigo_produto='" + codigoProduto + '\'' +
                 ", nome_produto='" + nome_produto + '\'' +
                 ", preco_produto=" + preco_produto +
                 ", linhaCategoria=" + linhaCategoria +
                 ", unidade_por_caixa=" + unidade_por_caixa +
                 ", peso_unidade=" + peso_unidade +
-                ", validade='" + validade + '\'' +
-                ", unidade_medida" + unidade_medida + '\'' +
+                ", unidade_medida='" + unidade_medida + '\'' +
+                ", validade=" + validade +
                 '}';
     }
 }

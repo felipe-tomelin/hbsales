@@ -5,16 +5,16 @@ public class CategoriaProdutoDTO {
     private Long id;
     private String nome_categoria;
     private Long id_fornecedor;
-    private String codigo;
+    private String codigoCategoria;
 
     public CategoriaProdutoDTO(){
     }
 
-    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, String codigo){
+    public CategoriaProdutoDTO(Long id, String nome_categoria, Long id_fornecedor, String codigoCategoria){
         this.id = id;
         this.nome_categoria = nome_categoria;
         this.id_fornecedor = id_fornecedor;
-        this.codigo = codigo;
+        this.codigoCategoria = codigoCategoria;
     }
 
 
@@ -23,17 +23,17 @@ public class CategoriaProdutoDTO {
                 categoria.getId(),
                 categoria.getNome_categoria(),
                 categoria.getFornecedor().getId(),
-                categoria.getCodigo()
+                categoria.getCodigoCategoria()
         );
     }
 
 
-    public String getCodigo() {
-        return codigo;
+    public String getCodigoCategoria() {
+        return codigoCategoria;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCodigoCategoria(String codigoCategoria) {
+        this.codigoCategoria = codigoCategoria;
     }
 
     public Long getId_fornecedor() {
@@ -65,7 +65,7 @@ public class CategoriaProdutoDTO {
         return "Categoria{" +
                 "id=" + id +
                 ", nome_categoria'" + nome_categoria + '\'' +
-                ", codigo'" + codigo + '\'' +
+                ", codigo'" + codigoCategoria + '\'' +
                 ", ID fornecedor'" + id_fornecedor + '\'' +
                 '}';
     }

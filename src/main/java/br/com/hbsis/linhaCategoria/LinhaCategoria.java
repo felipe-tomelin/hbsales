@@ -12,7 +12,7 @@ public class LinhaCategoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idLinha;
     @Column(name = "codigo_linha", unique = true, length = 10)
-    private String codigo_linha;
+    private String codigoLinha;
     @Column(name = "nome_linha", length = 50)
     private String nome_linha;
 
@@ -28,12 +28,12 @@ public class LinhaCategoria {
         this.idLinha = id;
     }
 
-    public String getCodigo_linha() {
-        return codigo_linha;
+    public String getCodigoLinha() {
+        return codigoLinha;
     }
 
-    public void setCodigo_linha(String codigo_linha) {
-        this.codigo_linha = codigo_linha;
+    public void setCodigoLinha(String codigoLinha) {
+        this.codigoLinha = codigoLinha;
     }
 
     public String getNome_linha() {
@@ -56,7 +56,7 @@ public class LinhaCategoria {
     public String toString() {
         return "LinhaCategoria{" +
                 "id=" + idLinha +
-                ", codigoLinha=" + codigo_linha +
+                ", codigoLinha=" + codigoLinha +
                 ", nomeLinha='" + nome_linha + '\'' +
                 ", categoria=" + categoria +
                 '}';

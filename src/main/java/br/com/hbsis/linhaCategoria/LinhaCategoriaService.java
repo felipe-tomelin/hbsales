@@ -31,8 +31,8 @@ public class LinhaCategoriaService {
         this.categoriaService = categoriaService;
     }
 
-    public String codigoValidarLinha (String codigo_linha){
-        String codigoProcessado = StringUtils.leftPad(codigo_linha, 10, "0");
+    public String codigoValidarLinha (String codigoLinha){
+        String codigoProcessado = StringUtils.leftPad(codigoLinha, 10, "0");
 
         return codigoProcessado;
     }
@@ -58,7 +58,7 @@ public class LinhaCategoriaService {
                     throw new IllegalArgumentException("Nome da linha não deve ser nulo");
                 }
 
-                if (StringUtils.isEmpty(linhaCategoriaDTO.getCodigo_linha())) {
+                if (StringUtils.isEmpty(linhaCategoriaDTO.getCodigoLinha())) {
                     throw new IllegalArgumentException("Codigo da linha não deve ser nulo");
                 } else {
                     LOGGER.info(String.format("ID Categoria %s não está vinculada", idLinha));
@@ -87,11 +87,11 @@ public class LinhaCategoriaService {
 
         linhaCategoria.setNome_linha(linhaCategoriaDTO.getNome_linha());
 
-            String codigolinha = linhaCategoriaDTO.getCodigo_linha();
+            String codigolinha = linhaCategoriaDTO.getCodigoLinha();
             String codigoLinhaUpperCase = codigolinha.toUpperCase();
             String cnpjProcessado = codigoValidarLinha(codigoLinhaUpperCase);
 
-        linhaCategoria.setCodigo_linha(cnpjProcessado);
+        linhaCategoria.setCodigoLinha(cnpjProcessado);
 
         CategoriaProdutoDTO categoriaProdutoDTO = categoriaService.findById(linhaCategoriaDTO.getIdLinha());
 
@@ -134,7 +134,7 @@ public class LinhaCategoriaService {
         icsvWriter.writeNext(tituloCSV);
 
         for (LinhaCategoria rows : linhaCategoriaRepository.findAll()){
-            icsvWriter.writeNext(new String[]{rows.getCodigo_linha(), rows.getNome_linha(), rows.getCategoria().getCodigo(), rows.getCategoria().getNome_categoria()});
+            icsvWriter.writeNext(new String[]{rows.getCodigoLinha(), rows.getNome_linha(), rows.getCategoria().getCodigoCategoria(), rows.getCategoria().getNome_categoria()});
         }
     }
 
@@ -153,18 +153,26 @@ public class LinhaCategoriaService {
 
                 LinhaCategoria linhaCategoria = new LinhaCategoria();
 
-                linhaCategoria.setCodigo_linha(dados[0]);
-                linhaCategoria.setNome_linha(dados[1]);
+                boolean valida = findByCodigo(dados[0]);
 
-                Categoria categoria = new Categoria();
-                CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findByCodigo(dados[2]);
-                categoria = converter(categoriaProdutoDTO);
+                if (valida == false) {
+                    linhaCategoria.setCodigoLinha(dados[0]);
+                    linhaCategoria.setNome_linha(dados[1]);
 
-                linhaCategoria.setCategoria(categoria);
+                    Categoria categoria = new Categoria();
+                    CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findByCodigoCategoria(dados[2]);
+                    categoria = converter(categoriaProdutoDTO);
 
-                result.add(linhaCategoria);
+                    linhaCategoria.setCategoria(categoria);
 
-                LOGGER.info("Validando importação");
+                    result.add(linhaCategoria);
+
+                    LOGGER.info("Validando importação");
+
+                    return linhaCategoriaRepository.saveAll(result);
+                }else if (valida == true){
+                    LOGGER.info("Linha de Categoria já cadastrada no banco de dados...");
+                }
             }catch (Exception e){
                 System.out.println("ERRO: "+e.getMessage());
             }
@@ -184,7 +192,7 @@ public class LinhaCategoriaService {
 
             linhaCategoriaExistente.setId(linhaCategoriaDTO.getIdLinha());
             linhaCategoriaExistente.setNome_linha(linhaCategoriaDTO.getNome_linha());
-            linhaCategoriaExistente.setCodigo_linha(linhaCategoriaDTO.getCodigo_linha());
+            linhaCategoriaExistente.setCodigoLinha(linhaCategoriaDTO.getCodigoLinha());
 
             CategoriaProdutoDTO categoriaProdutoDTO = categoriaService.findById(linhaCategoriaDTO.getIdLinha());
             Categoria categoria = converter(categoriaProdutoDTO);
@@ -203,4 +211,34 @@ public class LinhaCategoriaService {
         this.linhaCategoriaRepository.deleteById(id);
     }
 
+    public LinhaCategoriaDTO findByCodigoLinha(String codigo) {
+        Optional<LinhaCategoria> linhaCategoriaOptional = this.linhaCategoriaRepository.findByCodigoLinha(codigo);
+
+        if(linhaCategoriaOptional.isPresent()){
+            LinhaCategoria linhaCategoria = linhaCategoriaOptional.get();
+            LinhaCategoriaDTO linhaCategoriaDTO = LinhaCategoriaDTO.of(linhaCategoria);
+
+            return linhaCategoriaDTO;
+        }
+
+        String format = String.format("Codigo da linha %s não existe", codigo);
+
+        throw new IllegalArgumentException(format);
+    }
+
+    public boolean findByCodigo(String codigo) {
+        Optional<LinhaCategoria> linhaCategoriaOptional = this.linhaCategoriaRepository.findByCodigoLinha(codigo);
+
+        boolean valida;
+
+        if(linhaCategoriaOptional.isPresent()){
+            valida = true;
+
+            return valida;
+        }else{
+            valida = false;
+
+            return valida;
+        }
+    }
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class ProdutoDTO {
     private Long id;
-    private String codigo_produto;
+    private String codigoProduto;
     private String nome_produto;
     private Double preco_produto;
     private Long id_linha;
@@ -16,9 +16,9 @@ public class ProdutoDTO {
     public ProdutoDTO() {
     }
 
-    public ProdutoDTO(Long id, String codigo_produto, String nome_produto, Double preco_produto, Long id_linha, Long unidade_por_caixa, Double peso_unidade,String unidade_medida ,LocalDate validade) {
+    public ProdutoDTO(Long id, String codigoProduto, String nome_produto, Double preco_produto, Long id_linha, Long unidade_por_caixa, Double peso_unidade, String unidade_medida , LocalDate validade) {
         this.id = id;
-        this.codigo_produto = codigo_produto;
+        this.codigoProduto = codigoProduto;
         this.nome_produto = nome_produto;
         this.preco_produto = preco_produto;
         this.id_linha = id_linha;
@@ -31,7 +31,7 @@ public class ProdutoDTO {
     public static ProdutoDTO of(Produto produto){
         return new ProdutoDTO(
                 produto.getId(),
-                produto.getCodigo_produto(),
+                produto.getCodigoProduto(),
                 produto.getNome_produto(),
                 produto.getPreco_produto(),
                 produto.getLinhaCategoria().getId(),
@@ -50,12 +50,12 @@ public class ProdutoDTO {
         this.id = id;
     }
 
-    public String getCodigo_produto() {
-        return codigo_produto;
+    public String getCodigoProduto() {
+        return codigoProduto;
     }
 
-    public void setCodigo_produto(String codigo_produto) {
-        this.codigo_produto = codigo_produto;
+    public void setCodigoProduto(String codigoProduto) {
+        this.codigoProduto = codigoProduto;
     }
 
     public String getNome_produto() {
@@ -115,11 +115,10 @@ public class ProdutoDTO {
     }
 
     @Override
-    public String
-    toString() {
+    public String toString() {
         return "ProdutoDTO{" +
                 "id=" + id +
-                ", codigo_produto='" + codigo_produto + '\'' +
+                ", codigo_produto='" + codigoProduto + '\'' +
                 ", nome_produto='" + nome_produto + '\'' +
                 ", preco_produto=" + preco_produto +
                 ", id_linha=" + id_linha +

@@ -13,19 +13,19 @@ public class Categoria {
     private Long id;
     @Column(name = "nome_categoria", length = 50)
     private String nome_categoria;
-    @Column(name = "codigo", unique = true, length = 10)
-    private String codigo;
+    @Column(name = "codigo_categoria", unique = true, length = 10)
+    private String codigoCategoria;
     @ManyToOne
     @JoinColumn(name = "id_fornecedor", referencedColumnName = "id")
     private Fornecedor fornecedor;
 
 
-    public String getCodigo() {
-        return codigo;
+    public String getCodigoCategoria() {
+        return codigoCategoria;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCodigoCategoria(String codigoCategoria) {
+        this.codigoCategoria = codigoCategoria;
     }
 
     public Fornecedor getFornecedor() {
@@ -57,7 +57,7 @@ public class Categoria {
         return "Categoria{" +
                 "id=" + id +
                 ", nome_categoria'" + nome_categoria + '\'' +
-                ", codigo'" + codigo + '\'' +
+                ", codigo'" + codigoCategoria + '\'' +
                 ", fornecedor'" + fornecedor + '\'' +
                 '}';
     }

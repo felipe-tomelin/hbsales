@@ -63,13 +63,13 @@ public class CategoriaService {
 
         String cnpjProcessado = last4cnpj(cnpj);
 
-        String codigo = categoriaProdutoDTO.getCodigo();
+        String codigo = categoriaProdutoDTO.getCodigoCategoria();
 
         String zeroLeft = zeroLeft(codigo);
 
         String codigoFeito = "CAT" + cnpjProcessado + zeroLeft;
 
-        categoria.setCodigo(codigoFeito);
+        categoria.setCodigoCategoria(codigoFeito);
 
         Fornecedor fornecedor = converter(fornecedorDTO);
         categoria.setFornecedor(fornecedor);
@@ -94,7 +94,7 @@ public class CategoriaService {
             throw new IllegalArgumentException("ID do fornecedor não deve ser nulo");
         }
 
-        if (StringUtils.isEmpty(categoriaProdutoDTO.getCodigo())) {
+        if (StringUtils.isEmpty(categoriaProdutoDTO.getCodigoCategoria())) {
             throw new IllegalArgumentException("Código não deve ser nulo/vazio");
         }
 
@@ -113,14 +113,30 @@ public class CategoriaService {
         throw new IllegalArgumentException((String.format("ID não existente", id)));
     }
 
-    public CategoriaProdutoDTO findByCodigo (String codigo){
-        Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigo(codigo);
+    public CategoriaProdutoDTO findByCodigoCategoria (String codigo){
+        Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigo);
 
         if(categoriaOptional.isPresent()){
             return CategoriaProdutoDTO.of(categoriaOptional.get());
         }
 
         throw new IllegalArgumentException((String.format("Codigo não existente", codigo)));
+    }
+
+    public boolean findByCodigo (String codigo){
+        Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigo);
+
+        boolean valida;
+
+        if(categoriaOptional.isPresent()){
+            valida = true;
+
+            return valida;
+        }else{
+            valida = false;
+
+            return valida;
+        }
     }
 
     public  CategoriaProdutoDTO update(CategoriaProdutoDTO categoriaProdutoDTO, Long id){
@@ -134,7 +150,7 @@ public class CategoriaService {
             LOGGER.debug("Categoria existente: {}", categoriaExistente);
 
             categoriaExistente.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
-            categoriaExistente.setCodigo(categoriaProdutoDTO.getCodigo());
+            categoriaExistente.setCodigoCategoria(categoriaProdutoDTO.getCodigoCategoria());
 
             FornecedorDTO fornecedorDTO = fornecedorService.findById(categoriaProdutoDTO.getId_fornecedor());
             Fornecedor fornecedor = converter(fornecedorDTO);
@@ -145,13 +161,13 @@ public class CategoriaService {
 
             String cnpjProcessado = last4cnpj(cnpj);
 
-            String codigo = categoriaProdutoDTO.getCodigo();
+            String codigo = categoriaProdutoDTO.getCodigoCategoria();
 
             String zeroLeft = zeroLeft(codigo);
 
             String codigoFeito = "CAT" + cnpjProcessado + zeroLeft;
 
-            categoriaExistente.setCodigo(codigoFeito);
+            categoriaExistente.setCodigoCategoria(codigoFeito);
 
             categoriaExistente = this.categoriaRepository.save(categoriaExistente);
 
@@ -180,7 +196,7 @@ public class CategoriaService {
         icsvWriter.writeNext(tituloCSV);
 
         for (Categoria rows : categoriaRepository.findAll()) {
-            icsvWriter.writeNext(new String[]{rows.getCodigo(), rows.getNome_categoria(), rows.getFornecedor().getRazaoSocial(), formatarCnpj(rows.getFornecedor().getCnpj())});
+            icsvWriter.writeNext(new String[]{rows.getCodigoCategoria(), rows.getNome_categoria(), rows.getFornecedor().getRazaoSocial(), formatarCnpj(rows.getFornecedor().getCnpj())});
         }
     }
 
@@ -204,25 +220,32 @@ public class CategoriaService {
         List<String[]> row = leitor.readAll();
         List<Categoria> categoriaProdutoList = new ArrayList<>();
 
-        for(String[] linha : row){
+        for(String[] linha : row) {
 
             String[] dados = linha[0].replaceAll("\"", "").split(";");
 
             Categoria categoria = new Categoria();
 
-            categoria.setCodigo(dados[0]);
-            categoria.setNome_categoria(dados[1]);
+            boolean valida = findByCodigo(dados[0]);
 
-            Fornecedor fornecedor = new Fornecedor();
+            if (valida == false) {
 
-            String cnpjDesformatado = desformatarCnpj(dados[3]);
+                categoria.setCodigoCategoria(dados[0]);
+                categoria.setNome_categoria(dados[1]);
 
-            FornecedorDTO fornecedorDTO = fornecedorService.findByCnpj(cnpjDesformatado);
-            fornecedor = converter(fornecedorDTO);
+                Fornecedor fornecedor = new Fornecedor();
 
-            categoria.setFornecedor(fornecedor);
+                String cnpjDesformatado = desformatarCnpj(dados[3]);
 
-            categoriaProdutoList.add(categoria);
+                FornecedorDTO fornecedorDTO = fornecedorService.findByCnpj(cnpjDesformatado);
+                fornecedor = converter(fornecedorDTO);
+
+                categoria.setFornecedor(fornecedor);
+
+                categoriaProdutoList.add(categoria);
+            }else if (valida == true){
+                LOGGER.info("Categoria ja existente no banco de dados...");
+            }
         }
         LOGGER.info("Finalizando importação...");
 

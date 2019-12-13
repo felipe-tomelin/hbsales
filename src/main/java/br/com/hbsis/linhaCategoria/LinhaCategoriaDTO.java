@@ -4,16 +4,16 @@ public class LinhaCategoriaDTO {
     private Long idLinha;
     private Long id_categoria;
     private String nome_linha;
-    private String codigo_linha;
+    private String codigoLinha;
 
     public LinhaCategoriaDTO(){
     }
 
-    public LinhaCategoriaDTO(Long id, Long id_categoria, String nome_linha, String codigo_linha) {
+    public LinhaCategoriaDTO(Long id, Long id_categoria, String nome_linha, String codigoLinha) {
         this.idLinha = id;
         this.id_categoria = id_categoria;
         this.nome_linha = nome_linha;
-        this.codigo_linha = codigo_linha;
+        this.codigoLinha = codigoLinha;
     }
 
     public static LinhaCategoriaDTO of(LinhaCategoria linhaCategoria){
@@ -21,7 +21,7 @@ public class LinhaCategoriaDTO {
                 linhaCategoria.getId(),
                 linhaCategoria.getCategoria().getId(),
                 linhaCategoria.getNome_linha(),
-                linhaCategoria.getCodigo_linha()
+                linhaCategoria.getCodigoLinha()
         );
     }
 
@@ -49,12 +49,12 @@ public class LinhaCategoriaDTO {
         this.nome_linha = nome_linha;
     }
 
-    public String getCodigo_linha() {
-        return codigo_linha;
+    public String getCodigoLinha() {
+        return codigoLinha;
     }
 
-    public void setCodigo_linha(String codigo_linha) {
-        this.codigo_linha = codigo_linha;
+    public void setCodigoLinha(String codigoLinha) {
+        this.codigoLinha = codigoLinha;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class LinhaCategoriaDTO {
                 "idLinha=" + idLinha +
                 ", id_categoria=" + id_categoria +
                 ", nome_linha='" + nome_linha + '\'' +
-                ", codigo_linha=" + codigo_linha +
+                ", codigo_linha=" + codigoLinha +
                 '}';
     }
 }

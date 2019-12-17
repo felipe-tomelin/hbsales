@@ -58,4 +58,13 @@ public class ProdutoRest {
 
         this.produtoService.delete(id);
     }
+
+    @PostMapping("/importarcsvfornecedor/{id}")
+    public void importarCSVPorFornecedor(@RequestParam("file")MultipartFile file, @PathVariable("id") Long id) throws Exception {
+
+        LOGGER.info("Fornecedor id: [{}]", id);
+
+        produtoService.reconhecerFornecedor(id, file);
+
+    }
 }

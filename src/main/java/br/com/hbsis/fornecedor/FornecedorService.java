@@ -138,4 +138,21 @@ public class FornecedorService {
         throw new IllegalArgumentException(format);
     }
 
+    public boolean findByIdFornecedor(Long id) {
+        Optional<Fornecedor> fornecedorOptional = this.fornecedorRepository.findById(id);
+
+        boolean valida;
+
+        if (fornecedorOptional.isPresent()) {
+            valida = true;
+
+            return valida;
+        }else {
+            valida = false;
+
+            return valida;
+        }
+
+    }
+
 }

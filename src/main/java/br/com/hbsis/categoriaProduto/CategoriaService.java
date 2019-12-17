@@ -58,6 +58,8 @@ public class CategoriaService {
         categoria.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
 
         FornecedorDTO fornecedorDTO = fornecedorService.findById(categoriaProdutoDTO.getId_fornecedor());
+        Fornecedor fornecedor = converter(fornecedorDTO);
+        categoria.setFornecedor(fornecedor);
 
         String cnpj = fornecedorDTO.getCnpj();
 
@@ -71,8 +73,6 @@ public class CategoriaService {
 
         categoria.setCodigoCategoria(codigoFeito);
 
-        Fornecedor fornecedor = converter(fornecedorDTO);
-        categoria.setFornecedor(fornecedor);
 
         categoria = this.categoriaRepository.save(categoria);
 

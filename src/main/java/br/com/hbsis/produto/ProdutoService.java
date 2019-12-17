@@ -1,7 +1,16 @@
 package br.com.hbsis.produto;
 
+import br.com.hbsis.categoriaProduto.Categoria;
+import br.com.hbsis.categoriaProduto.CategoriaProdutoDTO;
+import br.com.hbsis.categoriaProduto.CategoriaRepository;
+import br.com.hbsis.categoriaProduto.CategoriaService;
+import br.com.hbsis.fornecedor.Fornecedor;
+import br.com.hbsis.fornecedor.FornecedorDTO;
+import br.com.hbsis.fornecedor.FornecedorRepository;
+import br.com.hbsis.fornecedor.FornecedorService;
 import br.com.hbsis.linhaCategoria.LinhaCategoria;
 import br.com.hbsis.linhaCategoria.LinhaCategoriaDTO;
+import br.com.hbsis.linhaCategoria.LinhaCategoriaRepository;
 import br.com.hbsis.linhaCategoria.LinhaCategoriaService;
 import com.opencsv.*;
 import org.apache.commons.lang.StringUtils;
@@ -25,11 +34,21 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final LinhaCategoriaService linhaCategoriaService;
+    private final FornecedorRepository fornecedorRepository;
+    private final CategoriaService categoriaService;
+    private final CategoriaRepository categoriaRepository;
+    private final FornecedorService fornecedorService;
+    private final LinhaCategoriaRepository linhaCategoriaRepository;
 
     @Autowired
-    public ProdutoService(ProdutoRepository produtoRepository, LinhaCategoriaService linhaCategoriaService) {
+    public ProdutoService(ProdutoRepository produtoRepository, LinhaCategoriaService linhaCategoriaService, FornecedorRepository fornecedorRepository, CategoriaService categoriaService, FornecedorService fornecedorService, CategoriaRepository categoriaRepository, LinhaCategoriaRepository linhaCategoriaRepository) {
         this.produtoRepository = produtoRepository;
         this.linhaCategoriaService = linhaCategoriaService;
+        this.fornecedorRepository = fornecedorRepository;
+        this.categoriaService = categoriaService;
+        this.fornecedorService = fornecedorService;
+        this.categoriaRepository = categoriaRepository;
+        this.linhaCategoriaRepository = linhaCategoriaRepository;
     }
 
     public void validate(ProdutoDTO produtoDTO){
@@ -134,6 +153,23 @@ public class ProdutoService {
         linhaCategoria.setId(linhaCategoriaDTO.getIdLinha());
 
         return linhaCategoria;
+    }
+
+    public Categoria converterCategoria(CategoriaProdutoDTO categoriaProdutoDTO) {
+
+        Categoria categoria = new Categoria();
+
+        categoria.setId(categoriaProdutoDTO.getId());
+
+        return categoria;
+    }
+
+    public Fornecedor converterFornecedor(FornecedorDTO fornecedorDTO){
+
+        Fornecedor fornecedor = new Fornecedor();
+
+        fornecedor.setId(fornecedorDTO.getId());
+        return fornecedor;
     }
 
     public ProdutoDTO findById(Long id){
@@ -322,7 +358,163 @@ public class ProdutoService {
         this.produtoRepository.deleteById(id);
     }
 
-    public void reconhecerTudo(MultipartFile importar) throws Exception{
+    public void reconhecerFornecedor(Long id, MultipartFile importar) throws Exception{
 
+        InputStreamReader inputStreamReader = new InputStreamReader(importar.getInputStream());
+
+        CSVReader leitor = new CSVReaderBuilder(inputStreamReader).withSkipLines(1).build();
+
+        List<String[]> row = leitor.readAll();
+
+        for (String[] linha : row) {
+
+            try{
+                String[] dados = linha[0].replaceAll("\"", "").split(";");
+
+                Produto produto = new Produto();
+                LinhaCategoria linhaCategoria = new LinhaCategoria();
+                Categoria categoria = new Categoria();
+
+                String produtoCodigo = dados[0];
+                String produtoNome = dados[1];
+                double preco = Double.parseDouble(dados[2].replace("R", "").replace("$", "").replaceAll(",", "."));
+                Long unidadeCaixa = Long.parseLong(dados[3]);
+                Double peso = Double.parseDouble(dados[4].replace("m", "").replace("g", "").replace("k", "")
+                        .replace("M", "").replace("K", "").replaceAll(",", " "));
+                String unidadeMedida = dados[4].replaceAll("\\d", "").replace(".", "");
+
+                String data = dados[5];
+                int ano = Integer.parseInt(data.substring(6, 10));
+                int mes = Integer.parseInt(data.substring(3, 5));
+                int dia = Integer.parseInt(data.substring(0, 2));
+                LocalDate validadeDesform = LocalDate.of(ano, mes, dia);
+
+                String codLinhaCategoria = dados[6];
+                String nomeLinha = dados[7];
+                String codigoCategoria = dados[8];
+                String nomeCategoria = dados[9];
+
+                LOGGER.info("ID do fornecedor [{}]", id);
+
+                boolean validarFornecedor = fornecedorService.findByIdFornecedor(id);
+                boolean validarCategoria = categoriaService.findByCodigo(dados[8]);
+                boolean validarLinha = linhaCategoriaService.findByCodigo(dados[6]);
+                boolean validarProduto = findByCodigoProduto(dados[0]);
+
+                if (fornecedorRepository.existsById(id)) {
+                    if(validarCategoria == false) {
+
+                        categoria.setNome_categoria(nomeCategoria);
+                        categoria.setCodigoCategoria(codigoCategoria);
+
+                        FornecedorDTO fornecedorDTO;
+                        fornecedorDTO = fornecedorService.findById(id);
+                        Fornecedor fornecedor = converterFornecedor(fornecedorDTO);
+                        categoria.setFornecedor(fornecedor);
+
+                        categoriaRepository.save(categoria);
+                            }else if (validarCategoria == true){
+                                Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigoCategoria);
+
+                                if (categoriaOptional.isPresent()){
+                                    Categoria categoriaExistente = categoriaOptional.get();
+
+                                    LOGGER.info("Alterando categoria de id: [{}]", categoriaExistente.getId());
+                                    LOGGER.debug("Payload: {}", categoriaExistente);
+                                    LOGGER.debug("Categoria existente: [{}]", categoriaExistente);
+
+                                    categoriaExistente.setCodigoCategoria(codigoCategoria);
+                                    categoriaExistente.setNome_categoria(nomeCategoria);
+
+                                    FornecedorDTO fornecedorDTO;
+                                    fornecedorDTO = fornecedorService.findById(id);
+                                    Fornecedor fornecedor = converterFornecedor(fornecedorDTO);
+                                    categoriaExistente.setFornecedor(fornecedor);
+
+                                    categoriaRepository.save(categoriaExistente);
+                                }
+                            }
+
+                    if (validarLinha == false){
+
+                        linhaCategoria.setCodigoLinha(codLinhaCategoria);
+                        linhaCategoria.setNome_linha(nomeLinha);
+
+                        CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findById(id);
+                        categoria = converterCategoria(categoriaProdutoDTO);
+
+                        linhaCategoria.setCategoria(categoria);
+
+                        linhaCategoriaRepository.save(linhaCategoria);
+                    }else if(validarLinha == true){
+                        Optional<LinhaCategoria> linhaCategoriaOptional = this.linhaCategoriaRepository.findByCodigoLinha(codLinhaCategoria);
+
+                            if(linhaCategoriaOptional.isPresent()){
+                                LinhaCategoria linhaCategoriaExistente = linhaCategoriaOptional.get();
+
+                                LOGGER.info("Alterando linha de id: [{}]", linhaCategoriaExistente.getId());
+                                LOGGER.debug("Payload: {}", linhaCategoriaExistente);
+                                LOGGER.debug("Linha categoria existente: {}", linhaCategoriaExistente);
+
+                                linhaCategoriaExistente.setCodigoLinha(codLinhaCategoria);
+                                linhaCategoriaExistente.setNome_linha(nomeLinha);
+
+                                CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findById(id);
+                                categoria = converterCategoria(categoriaProdutoDTO);
+
+                                linhaCategoriaExistente.setCategoria(categoria);
+
+                                linhaCategoriaRepository.save(linhaCategoriaExistente);
+                            }
+                    }
+
+                    if (validarProduto == true){
+
+                        Optional<Produto> produtoOptional = this.produtoRepository.findByCodigoProduto(produtoCodigo);
+                            if (produtoOptional.isPresent()){
+                               Produto produtoExistente = produtoOptional.get();
+
+                                LOGGER.info("Atualizando produto de id: [{}]", produtoExistente.getId());
+                                LOGGER.debug("Payload: {}", produtoExistente);
+                                LOGGER.debug("Produto existente: {}", produtoExistente);
+
+                               produtoExistente.setCodigoProduto(produtoCodigo);
+                               produtoExistente.setNome_produto(produtoNome);
+                               produtoExistente.setPreco_produto(preco);
+                               produtoExistente.setUnidade_por_caixa(unidadeCaixa);
+                               produtoExistente.setUnidade_medida(unidadeCaixa.toString());
+                               produtoExistente.setPeso_unidade(peso);
+                               produtoExistente.setUnidade_medida(unidadeMedida);
+                               produtoExistente.setValidade(validadeDesform);
+
+                               LinhaCategoriaDTO linhaCategoriaDTO = this.linhaCategoriaService.findByCodigoLinha(dados[6]);
+                               linhaCategoria = converter(linhaCategoriaDTO);
+
+                               produto.setLinhaCategoria(linhaCategoria);
+                            }
+                    } else if (validarProduto == false){
+                        produto.setCodigoProduto(produtoCodigo);
+                        produto.setNome_produto(produtoNome);
+                        produto.setPreco_produto(preco);
+                        produto.setUnidade_por_caixa(unidadeCaixa);
+                        produto.setPeso_unidade(peso);
+                        produto.setUnidade_medida(unidadeMedida);
+                        produto.setValidade(validadeDesform);
+
+                        LinhaCategoriaDTO linhaCategoriaDTO = this.linhaCategoriaService.findByCodigoLinha(dados[6]);
+                        linhaCategoria = converter(linhaCategoriaDTO);
+
+                        produto.setLinhaCategoria(linhaCategoria);
+
+                        produtoRepository.save(produto);
+                    }else {
+                        LOGGER.info("Produto {} pertencente a outro fornecedor", produto.getId());
+                    }
+                }
+
+            }catch(Exception e){
+                System.out.println("ERRO: " + e.getMessage());
+            }
+        }
     }
 }

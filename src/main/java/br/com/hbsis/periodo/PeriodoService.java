@@ -3,12 +3,18 @@ package br.com.hbsis.periodo;
 import br.com.hbsis.fornecedor.Fornecedor;
 import br.com.hbsis.fornecedor.FornecedorDTO;
 import br.com.hbsis.fornecedor.FornecedorService;
+import freemarker.template.SimpleDate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -24,18 +30,18 @@ public class PeriodoService {
         this.fornecedorService = fornecedorService;
     }
 
-    public void validate(PeriodoDTO periodoDTO){
+    public void validate(PeriodoDTO periodoDTO) {
         LOGGER.info("Validando Periodo");
 
-        if (StringUtils.isEmpty(periodoDTO.getDataInicio().toString())){
+        if (StringUtils.isEmpty(periodoDTO.getDataInicio().toString())) {
             throw new IllegalArgumentException("Data de inicio do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getDataFim().toString())){
+        if (StringUtils.isEmpty(periodoDTO.getDataFim().toString())) {
             throw new IllegalArgumentException("Data do fim do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getDataRetirada().toString())){
+        if (StringUtils.isEmpty(periodoDTO.getDataRetirada().toString())) {
             throw new IllegalArgumentException("Data de retirada do Periodo de vendas não deve ser nula/vazia");
         }
 
@@ -43,12 +49,28 @@ public class PeriodoService {
             throw new IllegalArgumentException("Descrição do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getId().toString())){
+        if (StringUtils.isEmpty(periodoDTO.getId().toString())) {
             throw new IllegalArgumentException("ID de Periodo não deve ser nulo/vazio");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getId_fornecedor().toString())){
+        if (StringUtils.isEmpty(periodoDTO.getId_fornecedor().toString())) {
             throw new IllegalArgumentException("ID de fornecedor não deve ser nulo/vazio");
+        }
+
+        if (periodoDTO.getDataInicio().isBefore(LocalDate.now()) || periodoDTO.getDataFim().isBefore(LocalDate.now()) || periodoDTO.getDataRetirada().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Datas não podem ser anteriores a hoje");
+        }
+
+        if (periodoRepository.existDataAberta(periodoDTO.getDataInicio(), periodoDTO.getId_fornecedor()) >= 1) {
+            throw new IllegalArgumentException("Fornecedor não pode ter dois periodos de venda ao mesmo tempo");
+        }
+
+        if (periodoDTO.getDataRetirada().isBefore(periodoDTO.getDataFim())){
+            throw new IllegalArgumentException("Data de retirada não pode ser anterior a data de fim do periodo");
+        }
+
+        if (periodoDTO.getDataFim().isBefore(periodoDTO.getDataInicio())){
+            throw new IllegalArgumentException("Data do fim não pode ser anterior a data de inicio do periodo");
         }
 
     }
@@ -104,26 +126,31 @@ public class PeriodoService {
     public PeriodoDTO update(PeriodoDTO periodoDTO, Long id){
         Optional<Periodo> periodoExistenteOptional = this.periodoRepository.findById(id);
 
-        if (periodoExistenteOptional.isPresent()){
-            Periodo periodoExistente = periodoExistenteOptional.get();
+        if (periodoDTO.getDataFim().isBefore(LocalDate.now())){
+            throw new IllegalArgumentException("Um periodo de vendas não pode ser mais alterado após o termino de sua vigência");
+        }else {
 
-            LOGGER.info("Atualizando, br.com.hbsis.periodo... id: [{}]", periodoExistente.getId());
-            LOGGER.debug("Payload: {}", periodoDTO);
-            LOGGER.debug("Categoria existente: {}", periodoExistente);
+            if (periodoExistenteOptional.isPresent()) {
+                Periodo periodoExistente = periodoExistenteOptional.get();
 
-            periodoExistente.setId(periodoDTO.getId());
-            periodoExistente.setDataInicio(periodoDTO.getDataInicio());
-            periodoExistente.setDataFim(periodoDTO.getDataFim());
-            periodoExistente.setDataRetirada(periodoDTO.getDataRetirada());
-            periodoExistente.setDescricao(periodoDTO.getDescricao());
+                LOGGER.info("Atualizando, br.com.hbsis.periodo... id: [{}]", periodoExistente.getId());
+                LOGGER.debug("Payload: {}", periodoDTO);
+                LOGGER.debug("Categoria existente: {}", periodoExistente);
 
-            FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getId_fornecedor());
-            Fornecedor fornecedor = converter(fornecedorDTO);
-            periodoExistente.setFornecedor(fornecedor);
+                periodoExistente.setId(periodoDTO.getId());
+                periodoExistente.setDataInicio(periodoDTO.getDataInicio());
+                periodoExistente.setDataFim(periodoDTO.getDataFim());
+                periodoExistente.setDataRetirada(periodoDTO.getDataRetirada());
+                periodoExistente.setDescricao(periodoDTO.getDescricao());
 
-            periodoExistente = this.periodoRepository.save(periodoExistente);
+                FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getId_fornecedor());
+                Fornecedor fornecedor = converter(fornecedorDTO);
+                periodoExistente.setFornecedor(fornecedor);
 
-            return periodoDTO.of(periodoExistente);
+                periodoExistente = this.periodoRepository.save(periodoExistente);
+
+                return periodoDTO.of(periodoExistente);
+            }
         }
         throw new IllegalArgumentException(String.format("ID %s não existe", id));
     }

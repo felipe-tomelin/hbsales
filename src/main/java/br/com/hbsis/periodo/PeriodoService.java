@@ -33,15 +33,15 @@ public class PeriodoService {
     public void validate(PeriodoDTO periodoDTO) {
         LOGGER.info("Validando Periodo");
 
-        if (StringUtils.isEmpty(periodoDTO.getDataInicio().toString())) {
+        if (periodoDTO.getDataInicio() == null) {
             throw new IllegalArgumentException("Data de inicio do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getDataFim().toString())) {
+        if (periodoDTO.getDataFim() == null) {
             throw new IllegalArgumentException("Data do fim do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getDataRetirada().toString())) {
+        if (periodoDTO.getDataRetirada() == null) {
             throw new IllegalArgumentException("Data de retirada do Periodo de vendas não deve ser nula/vazia");
         }
 

@@ -49,10 +49,6 @@ public class PeriodoService {
             throw new IllegalArgumentException("Descrição do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getId().toString())) {
-            throw new IllegalArgumentException("ID de Periodo não deve ser nulo/vazio");
-        }
-
         if (StringUtils.isEmpty(periodoDTO.getId_fornecedor().toString())) {
             throw new IllegalArgumentException("ID de fornecedor não deve ser nulo/vazio");
         }

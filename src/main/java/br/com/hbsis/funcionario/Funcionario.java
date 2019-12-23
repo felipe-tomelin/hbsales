@@ -13,7 +13,7 @@ public class Funcionario {
     String nome;
     @Column(name = "email", length = 50)
     String email;
-    @Column(name = "uuid", length = 36)
+    @Column(name = "uuid", length = 36, updatable = false)
     String uuid;
 
     public Funcionario() {

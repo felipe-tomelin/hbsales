@@ -19,7 +19,7 @@ public class PeriodoRest {
 
     @PostMapping
     public PeriodoDTO save(@RequestBody PeriodoDTO periodoDTO){
-        LOGGER.info("Recebendo solicitação de pesistencia de Periodo");
+        LOGGER.info("Recebendo solicitação de pesistencia de Periodo", periodoDTO.getId());
         LOGGER.debug("Payload: [{}]", periodoDTO);
 
         return this.periodoService.save(periodoDTO);

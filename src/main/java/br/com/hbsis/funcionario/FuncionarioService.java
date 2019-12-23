@@ -76,34 +76,6 @@ public class FuncionarioService {
         throw new IllegalArgumentException(String.format("ID não existente", id));
     }
 
-    public FuncionarioDTO update(FuncionarioDTO funcionarioDTO, Long id){
-        Optional<Funcionario> funcionarioExistenteOptional = this.funcionarioRepository.findById(id);
-
-        if (funcionarioExistenteOptional.isPresent()){
-            Funcionario funcionarioExistente = funcionarioExistenteOptional.get();
-
-            LOGGER.info("Atualizando, br.com.hbsis.funcionario... id: [{}]", funcionarioExistente.getId());
-            LOGGER.debug("Payload: [{}]", funcionarioDTO);
-            LOGGER.debug("Funcionario existente: {}", funcionarioExistente);
-
-            funcionarioExistente.setId(funcionarioDTO.getId());
-            funcionarioExistente.setNome(funcionarioDTO.getNome());
-            funcionarioExistente.setEmail(funcionarioDTO.getEmail());
-            funcionarioExistente.setUuid(funcionarioDTO.getUuid());
-
-            funcionarioExistente = this.funcionarioRepository.save(funcionarioExistente);
-
-            return funcionarioDTO.of(funcionarioExistente);
-        }
-        throw new IllegalArgumentException(String.format("ID %s não existe", id));
-    }
-
-    public void delete(Long id){
-        LOGGER.info("Executando delete para Funcionario de ID: [{}]", id);
-
-        this.funcionarioRepository.deleteById(id);
-    }
-
     public HBEmployeeDTO validaFuncionarioAPI(FuncionarioDTO funcionarioDTO){
         LOGGER.info("Validando funcionário na API HBEmployee");
 

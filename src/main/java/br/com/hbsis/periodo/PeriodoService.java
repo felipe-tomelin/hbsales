@@ -57,8 +57,8 @@ public class PeriodoService {
             throw new IllegalArgumentException("Datas não podem ser anteriores a hoje");
         }
 
-        if (periodoRepository.existDataAberta(periodoDTO.getDataInicio(), periodoDTO.getId_fornecedor()) >= 1) {
-            throw new IllegalArgumentException("Fornecedor não pode ter dois periodos de venda ao mesmo tempo");
+        if (periodoDTO.getDataInicio().isEqual(periodoDTO.getDataInicio()) && periodoDTO.getDataFim().isEqual(periodoDTO.getDataFim())){
+            throw new IllegalArgumentException("Datas não podem estar ocupando o mesmo periodo");
         }
 
         if (periodoDTO.getDataRetirada().isBefore(periodoDTO.getDataFim())){

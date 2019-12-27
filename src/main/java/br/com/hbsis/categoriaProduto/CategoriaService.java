@@ -35,12 +35,12 @@ public class CategoriaService {
 
     }
 
-    public String zeroLeft(String codigo){
+    public String completeZeroWithLeftPad(String codigo){
         String codigoProcessado = StringUtils.leftPad(codigo, 3, "0");
         return codigoProcessado;
     }
 
-    public String last4cnpj(String cnpj){
+    public String lastFourNumbersFromCNPJ(String cnpj){
         String last4 = cnpj.substring(cnpj.length() - 4);
 
         return last4;
@@ -61,17 +61,7 @@ public class CategoriaService {
         Fornecedor fornecedor = converter(fornecedorDTO);
         categoria.setFornecedor(fornecedor);
 
-        String cnpj = fornecedorDTO.getCnpj();
-
-        String cnpjProcessado = last4cnpj(cnpj);
-
-        String codigo = categoriaProdutoDTO.getCodigoCategoria();
-
-        String zeroLeft = zeroLeft(codigo);
-
-        String codigoFeito = "CAT" + cnpjProcessado + zeroLeft;
-
-        categoria.setCodigoCategoria(codigoFeito);
+        categoria.setCodigoCategoria(codigoCategoriaConcatenado());
 
 
         categoria = this.categoriaRepository.save(categoria);
@@ -123,7 +113,7 @@ public class CategoriaService {
         throw new IllegalArgumentException((String.format("Codigo não existente", codigo)));
     }
 
-    public boolean findByCodigo (String codigo){
+    public boolean findExistsByCodigo(String codigo){
         Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigo);
 
         boolean valida;
@@ -139,8 +129,28 @@ public class CategoriaService {
         }
     }
 
+    public String codigoCategoriaConcatenado() {
+
+        FornecedorDTO fornecedorDTO = new FornecedorDTO();
+        CategoriaProdutoDTO categoriaProdutoDTO = new CategoriaProdutoDTO();
+
+        String cnpj = fornecedorDTO.getCnpj();
+
+        String cnpjProcessado = lastFourNumbersFromCNPJ(cnpj);
+
+        String codigo = categoriaProdutoDTO.getCodigoCategoria();
+
+        String zeroLeft = completeZeroWithLeftPad(codigo);
+
+        String codigoFeito = "CAT" + cnpjProcessado + zeroLeft;
+
+        return codigoFeito;
+    }
+
     public  CategoriaProdutoDTO update(CategoriaProdutoDTO categoriaProdutoDTO, Long id){
         Optional<Categoria> categoriaExistenteOptional = this.categoriaRepository.findById(id);
+
+        this.validate(categoriaProdutoDTO);
 
         if (categoriaExistenteOptional.isPresent()) {
             Categoria categoriaExistente = categoriaExistenteOptional.get();
@@ -157,17 +167,7 @@ public class CategoriaService {
 
             categoriaExistente.setFornecedor(fornecedor);
 
-            String cnpj = fornecedorDTO.getCnpj();
-
-            String cnpjProcessado = last4cnpj(cnpj);
-
-            String codigo = categoriaProdutoDTO.getCodigoCategoria();
-
-            String zeroLeft = zeroLeft(codigo);
-
-            String codigoFeito = "CAT" + cnpjProcessado + zeroLeft;
-
-            categoriaExistente.setCodigoCategoria(codigoFeito);
+            categoriaExistente.setCodigoCategoria(codigoCategoriaConcatenado());
 
             categoriaExistente = this.categoriaRepository.save(categoriaExistente);
 
@@ -178,13 +178,13 @@ public class CategoriaService {
 
     }
 
-        public void delete(Long id){
+    public void delete(Long id){
             LOGGER.info("Executando delete para Categoria de ID: [{}]", id);
 
             this.categoriaRepository.deleteById(id);
         }
 
-    public void findAll (HttpServletResponse resposta) throws Exception {
+    public void exportCSVForCategoriaService(HttpServletResponse resposta) throws Exception {
         String arquivo = "categoria.csv";
         resposta.setContentType("text/csv");
         resposta.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + arquivo + "\"");
@@ -211,7 +211,7 @@ public class CategoriaService {
         return cnpjForm;
     }
 
-    public List<Categoria> catchAll(MultipartFile file) throws Exception {
+    public List<Categoria> importLeitorCSVForCategoriaService(MultipartFile file) throws Exception {
 
         InputStreamReader inputStreamReader = new InputStreamReader(file.getInputStream());
 
@@ -226,7 +226,7 @@ public class CategoriaService {
 
             Categoria categoria = new Categoria();
 
-            boolean valida = findByCodigo(dados[0]);
+            boolean valida = findExistsByCodigo(dados[0]);
 
             if (valida == false) {
 

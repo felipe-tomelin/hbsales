@@ -10,11 +10,4 @@ import java.util.Date;
 
 @Repository
 public interface PeriodoRepository extends JpaRepository<Periodo, Long> {
-
-    @Query(value = "SELECT COUNT(1) FROM seg_periodo WHERE data_final >= :dataInicio AND id_fornecedor = :fornecedor", nativeQuery = true)
-    Long existDataAberta(
-            @Param("dataInicio")
-                    LocalDate dataInicio,
-            @Param("fornecedor")
-                    Long fornecedor);
 }

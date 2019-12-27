@@ -2,19 +2,19 @@ package br.com.hbsis.invoiceItem;
 
 public class InvoiceItemDTO {
 
-    private int amount;
+    private Long amount;
     private String itemName;
 
-    public InvoiceItemDTO(int amount, String itemName) {
+    public InvoiceItemDTO(Long amount, String itemName) {
         this.amount = amount;
         this.itemName = itemName;
     }
 
-    public int getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 

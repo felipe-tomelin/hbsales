@@ -30,13 +30,16 @@ public class PedidoDTO {
     }
 
     public static PedidoDTO of(Pedido pedido){
+        List<ItemDTO> itemDTOList = new ArrayList<>();
+        /*Conversão de Item para ItemDTO*/
+        pedido.getItemList().forEach(item -> itemDTOList.add(ItemDTO.of(item)));
         return new PedidoDTO(
                 pedido.getId(),
                 pedido.getCodigo(),
                 pedido.getStatus(),
                 pedido.getFornecedor().getId(),
                 pedido.getDataCriacao(),
-                pedido.getItemList(),
+                itemDTOList,
                 pedido.getTotalValue()
         );
     }

@@ -28,7 +28,7 @@ public class ProdutoRest {
     }
 
     @GetMapping("/{id}")
-    public ProdutoDTO find(@PathVariable("id") Long id){
+    public Produto find(@PathVariable("id") Long id){
         LOGGER.info("Recebendo find by id, ID: [{}]", id);
 
         return  this.produtoService.findById(id);
@@ -36,12 +36,12 @@ public class ProdutoRest {
 
     @GetMapping("/exportcsv")
     public void exportCSV(HttpServletResponse file) throws Exception {
-        produtoService.findAll(file);
+        produtoService.exportWriterCSVForProdutoService(file);
     }
 
     @PostMapping("/importcsv")
     public void importCSV(@RequestParam("file")MultipartFile file) throws Exception {
-        produtoService.reconhecer(file);
+        produtoService.importReaderCSVForProdutoService(file);
     }
 
     @PutMapping("/{id}")
@@ -64,7 +64,7 @@ public class ProdutoRest {
 
         LOGGER.info("Fornecedor id: [{}]", id);
 
-        produtoService.reconhecerFornecedor(id, file);
+        produtoService.importReaderCSVFornecedorWithSaveOrUpdateForProdutoService(id, file);
 
     }
 }

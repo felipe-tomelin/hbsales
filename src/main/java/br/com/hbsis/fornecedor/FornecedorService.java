@@ -93,6 +93,8 @@ public class FornecedorService {
     public FornecedorDTO update(FornecedorDTO fornecedorDTO, Long Id) {
         Optional<Fornecedor> fornecedorExistenteOptional = this.fornecedorRepository.findById(Id);
 
+        this.validate(fornecedorDTO);
+
         if (fornecedorExistenteOptional.isPresent()) {
             Fornecedor fornecedorExistente = fornecedorExistenteOptional.get();
 
@@ -138,7 +140,7 @@ public class FornecedorService {
         throw new IllegalArgumentException(format);
     }
 
-    public boolean findByIdFornecedor(Long id) {
+    public boolean findExistsByIdFornecedor(Long id) {
         Optional<Fornecedor> fornecedorOptional = this.fornecedorRepository.findById(id);
 
         boolean valida;

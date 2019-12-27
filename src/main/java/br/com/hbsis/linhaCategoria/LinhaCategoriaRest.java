@@ -36,12 +36,12 @@ public class LinhaCategoriaRest {
 
     @GetMapping("/exportcsv")
     public void exportCSV(HttpServletResponse file) throws Exception {
-        linhaCategoriaService.findAll(file);
+        linhaCategoriaService.exportBuilderCSVForLinhaCategoria(file);
     }
 
     @PostMapping("/importcsv")
         public void importCSV(@RequestParam("file")MultipartFile file) throws Exception {
-        linhaCategoriaService.reconhecer(file);
+        linhaCategoriaService.importReaderCSVForLinhaCategoria(file);
     }
 
     @PutMapping("/{id}")

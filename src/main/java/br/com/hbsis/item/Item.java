@@ -19,8 +19,7 @@ public class Item {
     @Column(name = "quantidade_produto")
     private Long quantidadeProduto;
 
-    public Item(Long id, Produto produto, Long quantidadeProduto) {
-        this.id = id;
+    public Item(Produto produto, Long quantidadeProduto) {
         this.produto = produto;
         this.quantidadeProduto = quantidadeProduto;
     }

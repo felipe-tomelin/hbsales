@@ -26,7 +26,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -51,59 +53,70 @@ public class ProdutoService {
         this.linhaCategoriaRepository = linhaCategoriaRepository;
     }
 
-    public void validate(ProdutoDTO produtoDTO){
+    public void validate(ProdutoDTO produtoDTO) {
         LOGGER.info("Validando Produto");
 
         String unidade = produtoDTO.getUnidade_medida();
         String last2peso = unidade.substring(unidade.length() - 2);
         String last1peso = unidade.substring(unidade.length() - 1);
 
-        if (last2peso.equals("kg") || last2peso.equals("mg") || last1peso.equals("g")){
+        if (last2peso.equals("kg") || last2peso.equals("mg") || last1peso.equals("g")) {
             LOGGER.info("Deu certo validação unidade peso");
-        }else {
+        } else {
             throw new IllegalArgumentException("Unidade peso somente em kg, mg e g");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getId().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getId().toString())) {
             throw new IllegalArgumentException("ID da Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getCodigoProduto())) {
+        if (StringUtils.isEmpty(produtoDTO.getCodigoProduto())) {
             throw new IllegalArgumentException("Codigo de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getNome_produto())) {
+        if (StringUtils.isEmpty(produtoDTO.getNome_produto())) {
             throw new IllegalArgumentException("Nome de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getPreco_produto().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getPreco_produto().toString())) {
             throw new IllegalArgumentException("Preço de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getId_linha().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getId_linha().toString())) {
             throw new IllegalArgumentException("Id de Linha de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getUnidade_por_caixa().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getUnidade_por_caixa().toString())) {
             throw new IllegalArgumentException("Unidade por caixa de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getPeso_unidade().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getPeso_unidade().toString())) {
             throw new IllegalArgumentException("Peso de unidade de Produto não deve ser nulo");
         }
 
-        if(StringUtils.isEmpty(produtoDTO.getValidade().toString())) {
+        if (StringUtils.isEmpty(produtoDTO.getValidade().toString())) {
             throw new IllegalArgumentException("Validade de Produto não deve ser nulo");
         }
     }
 
-    public String codigoValidarLinha (String codigo_produto){
+    public String completePadWithZeroLeft(String codigo_produto) {
         String codigoProcessado = StringUtils.leftPad(codigo_produto, 10, "0");
 
         return codigoProcessado;
     }
 
-    public ProdutoDTO save(ProdutoDTO produtoDTO){
+    public String codigoConcatenadoProdutoService() {
+
+        ProdutoDTO produtoDTO = new ProdutoDTO();
+
+        String codigoProduto = produtoDTO.getCodigoProduto();
+        String codigoUpper = codigoProduto.toUpperCase();
+        String codigoPronto = completePadWithZeroLeft(codigoUpper);
+
+        return codigoPronto;
+    }
+
+    public ProdutoDTO save(ProdutoDTO produtoDTO) {
 
         this.validate(produtoDTO);
 
@@ -113,10 +126,8 @@ public class ProdutoService {
         Produto produto = new Produto();
 
         /*CODIGO*/
-        String codigoProduto = produtoDTO.getCodigoProduto();
-        String codigoUpper = codigoProduto.toUpperCase();
-        String codigoPronto = codigoValidarLinha(codigoUpper);
-        produto.setCodigoProduto(codigoPronto);
+
+        produto.setCodigoProduto(codigoConcatenadoProdutoService());
 
         /*NOME*/
         produto.setNome_produto(produtoDTO.getNome_produto());
@@ -146,7 +157,7 @@ public class ProdutoService {
         return produtoDTO.of(produto);
     }
 
-    public LinhaCategoria converter(LinhaCategoriaDTO linhaCategoriaDTO){
+    public LinhaCategoria converter(LinhaCategoriaDTO linhaCategoriaDTO) {
 
         LinhaCategoria linhaCategoria = new LinhaCategoria();
 
@@ -164,7 +175,7 @@ public class ProdutoService {
         return categoria;
     }
 
-    public Fornecedor converterFornecedor(FornecedorDTO fornecedorDTO){
+    public Fornecedor converterFornecedor(FornecedorDTO fornecedorDTO) {
 
         Fornecedor fornecedor = new Fornecedor();
 
@@ -172,26 +183,24 @@ public class ProdutoService {
         return fornecedor;
     }
 
-    public ProdutoDTO findById(Long id){
+    public Produto findById(Long id) {
         Optional<Produto> produtoOptional = this.produtoRepository.findById(id);
 
-        if (produtoOptional.isPresent()){
-            Produto produto = produtoOptional.get();
-            ProdutoDTO produtoDTO = ProdutoDTO.of(produto);
+        if (produtoOptional.isPresent()) {
+            return produtoOptional.get();
 
-            return produtoDTO;
         }
         throw new IllegalArgumentException(String.format("ID %s não existente", id));
     }
 
-    public String formatarPreco(Double preco_produto){
+    public String formatarPreco(Double preco_produto) {
 
-        String format = "R$"+preco_produto;
+        String format = "R$" + preco_produto;
 
         return format;
     }
 
-    public String pesoConc(Double peso_unidade, String unidade_medida){
+    public String pesoConcatenadoMediaUnidade(Double peso_unidade, String unidade_medida) {
 
         Double peso = peso_unidade;
         String unidade = unidade_medida;
@@ -201,7 +210,7 @@ public class ProdutoService {
         return pesoConcatenado;
     }
 
-    public String validadeForm(LocalDate validade){
+    public String validadeFormatDMY(LocalDate validade) {
 
         LocalDate data = validade;
 
@@ -212,12 +221,12 @@ public class ProdutoService {
         return formatado;
     }
 
-    public String formatarCnpj(String cnpj){
+    public String formatarCnpj(String cnpj) {
 
-        String cnpjForm =  cnpj.substring(0, 2)+ "."+
-                cnpj.substring(2, 5)+"."+
-                cnpj.substring(5, 8)+ "/"+
-                cnpj.substring(8, 12)+"-"+
+        String cnpjForm = cnpj.substring(0, 2) + "." +
+                cnpj.substring(2, 5) + "." +
+                cnpj.substring(5, 8) + "/" +
+                cnpj.substring(8, 12) + "-" +
                 cnpj.substring(12, 14);
 
         return cnpjForm;
@@ -229,18 +238,18 @@ public class ProdutoService {
 
         Optional<Produto> produtoOptional = this.produtoRepository.findByCodigoProduto(codigoProduto);
 
-        if(produtoOptional.isPresent()){
+        if (produtoOptional.isPresent()) {
             valida = true;
 
             return valida;
-        }else {
-           valida = false;
+        } else {
+            valida = false;
 
             return valida;
         }
     }
 
-    public void findAll (HttpServletResponse resposta) throws Exception {
+    public void exportWriterCSVForProdutoService(HttpServletResponse resposta) throws Exception {
         String arquivo = "produto.csv";
         resposta.setContentType("text/csv");
         resposta.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + arquivo + "\"");
@@ -250,14 +259,14 @@ public class ProdutoService {
         ICSVWriter icsvWriter = new CSVWriterBuilder(writer).withSeparator(';').withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER).withLineEnd(CSVWriter.DEFAULT_LINE_END).build();
 
         String[] tituloCSV = {"codigo", "nome", "preço", "unidade_por_caixa", "peso_por_unidade", "validade",
-                "codigo_linha", "nome_linha", "codigo_categoria","nome_categoria", "cnpj_fornecedor", "razao_social"};
+                "codigo_linha", "nome_linha", "codigo_categoria", "nome_categoria", "cnpj_fornecedor", "razao_social"};
 
         icsvWriter.writeNext(tituloCSV);
 
-        for (Produto rows : produtoRepository.findAll()){
+        for (Produto rows : produtoRepository.findAll()) {
             icsvWriter.writeNext(new String[]{
                     rows.getCodigoProduto(), rows.getNome_produto(), String.valueOf(formatarPreco(rows.getPreco_produto())),
-                    rows.getUnidade_por_caixa().toString(), pesoConc(rows.getPeso_unidade(), rows.getUnidade_medida()), validadeForm(rows.getValidade()),
+                    rows.getUnidade_por_caixa().toString(), pesoConcatenadoMediaUnidade(rows.getPeso_unidade(), rows.getUnidade_medida()), validadeFormatDMY(rows.getValidade()),
                     rows.getLinhaCategoria().getCodigoLinha(), rows.getLinhaCategoria().getNome_linha(),
                     rows.getLinhaCategoria().getCategoria().getCodigoCategoria(), rows.getLinhaCategoria().getCategoria().getNome_categoria(),
                     formatarCnpj(rows.getLinhaCategoria().getCategoria().getFornecedor().getCnpj()),
@@ -265,7 +274,7 @@ public class ProdutoService {
         }
     }
 
-    public List<Produto> reconhecer(MultipartFile importacao) throws Exception {
+    public List<Produto> importReaderCSVForProdutoService(MultipartFile importacao) throws Exception {
 
         InputStreamReader inserir = new InputStreamReader(importacao.getInputStream());
 
@@ -280,7 +289,7 @@ public class ProdutoService {
 
                 Produto produto = new Produto();
 
-                boolean valida  = findByCodigoProduto(dados[0]);
+                boolean valida = findByCodigoProduto(dados[0]);
 
                 if (valida == false) {
 
@@ -320,13 +329,15 @@ public class ProdutoService {
                 System.out.println("ERRO: " + e.getMessage());
             }
         }
-            return produtoRepository.saveAll(result);
+        return produtoRepository.saveAll(result);
     }
 
-    public ProdutoDTO update(ProdutoDTO produtoDTO, Long id){
+    public ProdutoDTO update(ProdutoDTO produtoDTO, Long id) {
         Optional<Produto> produtoExistenteOptional = this.produtoRepository.findById(id);
 
-        if(produtoExistenteOptional.isPresent()){
+        this.validate(produtoDTO);
+
+        if (produtoExistenteOptional.isPresent()) {
             Produto produtoExistente = produtoExistenteOptional.get();
 
             LOGGER.info("Atualizando, br.com.hbsis.Produto... ID: [{}]", produtoExistente.getId());
@@ -353,12 +364,12 @@ public class ProdutoService {
         throw new IllegalArgumentException(String.format("ID %s não existente", id));
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         LOGGER.info("Executando delete para Produto de ID: [{}]");
         this.produtoRepository.deleteById(id);
     }
 
-    public void reconhecerFornecedor(Long id, MultipartFile importar) throws Exception{
+    public void importReaderCSVFornecedorWithSaveOrUpdateForProdutoService(Long id, MultipartFile importar) throws Exception {
 
         InputStreamReader inputStreamReader = new InputStreamReader(importar.getInputStream());
 
@@ -368,7 +379,7 @@ public class ProdutoService {
 
         for (String[] linha : row) {
 
-            try{
+            try {
                 String[] dados = linha[0].replaceAll("\"", "").split(";");
 
                 Produto produto = new Produto();
@@ -396,13 +407,12 @@ public class ProdutoService {
 
                 LOGGER.info("ID do fornecedor [{}]", id);
 
-                boolean validarFornecedor = fornecedorService.findByIdFornecedor(id);
-                boolean validarCategoria = categoriaService.findByCodigo(dados[8]);
-                boolean validarLinha = linhaCategoriaService.findByCodigo(dados[6]);
+                boolean validarCategoria = categoriaService.findExistsByCodigo(dados[8]);
+                boolean validarLinha = linhaCategoriaService.findExistsByCodigoLinhaCategoria(dados[6]);
                 boolean validarProduto = findByCodigoProduto(dados[0]);
 
                 if (fornecedorRepository.existsById(id)) {
-                    if(validarCategoria == false) {
+                    if (!validarCategoria) {
 
                         categoria.setNome_categoria(nomeCategoria);
                         categoria.setCodigoCategoria(codigoCategoria);
@@ -413,29 +423,29 @@ public class ProdutoService {
                         categoria.setFornecedor(fornecedor);
 
                         categoriaRepository.save(categoria);
-                            }else if (validarCategoria == true){
-                                Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigoCategoria);
+                    } else if (validarCategoria) {
+                        Optional<Categoria> categoriaOptional = this.categoriaRepository.findByCodigoCategoria(codigoCategoria);
 
-                                if (categoriaOptional.isPresent()){
-                                    Categoria categoriaExistente = categoriaOptional.get();
+                        if (categoriaOptional.isPresent()) {
+                            Categoria categoriaExistente = categoriaOptional.get();
 
-                                    LOGGER.info("Alterando categoria de id: [{}]", categoriaExistente.getId());
-                                    LOGGER.debug("Payload: {}", categoriaExistente);
-                                    LOGGER.debug("Categoria existente: [{}]", categoriaExistente);
+                            LOGGER.info("Alterando categoria de id: [{}]", categoriaExistente.getId());
+                            LOGGER.debug("Payload: {}", categoriaExistente);
+                            LOGGER.debug("Categoria existente: [{}]", categoriaExistente);
 
-                                    categoriaExistente.setCodigoCategoria(codigoCategoria);
-                                    categoriaExistente.setNome_categoria(nomeCategoria);
+                            categoriaExistente.setCodigoCategoria(codigoCategoria);
+                            categoriaExistente.setNome_categoria(nomeCategoria);
 
-                                    FornecedorDTO fornecedorDTO;
-                                    fornecedorDTO = fornecedorService.findById(id);
-                                    Fornecedor fornecedor = converterFornecedor(fornecedorDTO);
-                                    categoriaExistente.setFornecedor(fornecedor);
+                            FornecedorDTO fornecedorDTO;
+                            fornecedorDTO = fornecedorService.findById(id);
+                            Fornecedor fornecedor = converterFornecedor(fornecedorDTO);
+                            categoriaExistente.setFornecedor(fornecedor);
 
-                                    categoriaRepository.save(categoriaExistente);
-                                }
-                            }
+                            categoriaRepository.save(categoriaExistente);
+                        }
+                    }
 
-                    if (validarLinha == false){
+                    if (!validarLinha) {
 
                         linhaCategoria.setCodigoLinha(codLinhaCategoria);
                         linhaCategoria.setNome_linha(nomeLinha);
@@ -446,53 +456,53 @@ public class ProdutoService {
                         linhaCategoria.setCategoria(categoria);
 
                         linhaCategoriaRepository.save(linhaCategoria);
-                    }else if(validarLinha == true){
+                    } else if (validarLinha) {
                         Optional<LinhaCategoria> linhaCategoriaOptional = this.linhaCategoriaRepository.findByCodigoLinha(codLinhaCategoria);
 
-                            if(linhaCategoriaOptional.isPresent()){
-                                LinhaCategoria linhaCategoriaExistente = linhaCategoriaOptional.get();
+                        if (linhaCategoriaOptional.isPresent()) {
+                            LinhaCategoria linhaCategoriaExistente = linhaCategoriaOptional.get();
 
-                                LOGGER.info("Alterando linha de id: [{}]", linhaCategoriaExistente.getId());
-                                LOGGER.debug("Payload: {}", linhaCategoriaExistente);
-                                LOGGER.debug("Linha categoria existente: {}", linhaCategoriaExistente);
+                            LOGGER.info("Alterando linha de id: [{}]", linhaCategoriaExistente.getId());
+                            LOGGER.debug("Payload: {}", linhaCategoriaExistente);
+                            LOGGER.debug("Linha categoria existente: {}", linhaCategoriaExistente);
 
-                                linhaCategoriaExistente.setCodigoLinha(codLinhaCategoria);
-                                linhaCategoriaExistente.setNome_linha(nomeLinha);
+                            linhaCategoriaExistente.setCodigoLinha(codLinhaCategoria);
+                            linhaCategoriaExistente.setNome_linha(nomeLinha);
 
-                                CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findById(id);
-                                categoria = converterCategoria(categoriaProdutoDTO);
+                            CategoriaProdutoDTO categoriaProdutoDTO = this.categoriaService.findById(id);
+                            categoria = converterCategoria(categoriaProdutoDTO);
 
-                                linhaCategoriaExistente.setCategoria(categoria);
+                            linhaCategoriaExistente.setCategoria(categoria);
 
-                                linhaCategoriaRepository.save(linhaCategoriaExistente);
-                            }
+                            linhaCategoriaRepository.save(linhaCategoriaExistente);
+                        }
                     }
 
-                    if (validarProduto == true){
+                    if (validarProduto) {
 
                         Optional<Produto> produtoOptional = this.produtoRepository.findByCodigoProduto(produtoCodigo);
-                            if (produtoOptional.isPresent()){
-                               Produto produtoExistente = produtoOptional.get();
+                        if (produtoOptional.isPresent()) {
+                            Produto produtoExistente = produtoOptional.get();
 
-                                LOGGER.info("Atualizando produto de id: [{}]", produtoExistente.getId());
-                                LOGGER.debug("Payload: {}", produtoExistente);
-                                LOGGER.debug("Produto existente: {}", produtoExistente);
+                            LOGGER.info("Atualizando produto de id: [{}]", produtoExistente.getId());
+                            LOGGER.debug("Payload: {}", produtoExistente);
+                            LOGGER.debug("Produto existente: {}", produtoExistente);
 
-                               produtoExistente.setCodigoProduto(produtoCodigo);
-                               produtoExistente.setNome_produto(produtoNome);
-                               produtoExistente.setPreco_produto(preco);
-                               produtoExistente.setUnidade_por_caixa(unidadeCaixa);
-                               produtoExistente.setUnidade_medida(unidadeCaixa.toString());
-                               produtoExistente.setPeso_unidade(peso);
-                               produtoExistente.setUnidade_medida(unidadeMedida);
-                               produtoExistente.setValidade(validadeDesform);
+                            produtoExistente.setCodigoProduto(produtoCodigo);
+                            produtoExistente.setNome_produto(produtoNome);
+                            produtoExistente.setPreco_produto(preco);
+                            produtoExistente.setUnidade_por_caixa(unidadeCaixa);
+                            produtoExistente.setUnidade_medida(unidadeCaixa.toString());
+                            produtoExistente.setPeso_unidade(peso);
+                            produtoExistente.setUnidade_medida(unidadeMedida);
+                            produtoExistente.setValidade(validadeDesform);
 
-                               LinhaCategoriaDTO linhaCategoriaDTO = this.linhaCategoriaService.findByCodigoLinha(dados[6]);
-                               linhaCategoria = converter(linhaCategoriaDTO);
+                            LinhaCategoriaDTO linhaCategoriaDTO = this.linhaCategoriaService.findByCodigoLinha(dados[6]);
+                            linhaCategoria = converter(linhaCategoriaDTO);
 
-                               produto.setLinhaCategoria(linhaCategoria);
-                            }
-                    } else if (validarProduto == false){
+                            produto.setLinhaCategoria(linhaCategoria);
+                        }
+                    } else if (!validarProduto) {
                         produto.setCodigoProduto(produtoCodigo);
                         produto.setNome_produto(produtoNome);
                         produto.setPreco_produto(preco);
@@ -507,13 +517,13 @@ public class ProdutoService {
                         produto.setLinhaCategoria(linhaCategoria);
 
                         produtoRepository.save(produto);
-                    }else {
+                    } else {
                         LOGGER.info("Produto {} pertencente a outro fornecedor", produto.getId());
                     }
                 }
 
-            }catch(Exception e){
-                System.out.println("ERRO: " + e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error("ERRO: {} " + e.getMessage());
             }
         }
     }

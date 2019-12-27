@@ -31,12 +31,12 @@ public class CategoriaRest {
 
         LOGGER.info("Recebendo importação de um CSV...");
 
-        categoriaService.catchAll(file);
+        categoriaService.importLeitorCSVForCategoriaService(file);
 
     }
 
     @GetMapping("/{id}")
-    public CategoriaProdutoDTO find(@PathVariable("id") Long id) {
+    public CategoriaProdutoDTO findById(@PathVariable("id") Long id) {
         LOGGER.info("Recebendo find by id, id: [{}]", id);
 
         return this.categoriaService.findById(id);
@@ -47,7 +47,7 @@ public class CategoriaRest {
 
         LOGGER.info("Recebendo exportação para CSV... ");
 
-        categoriaService.findAll(file);
+        categoriaService.exportCSVForCategoriaService(file);
     }
 
     @PutMapping("/{id}")

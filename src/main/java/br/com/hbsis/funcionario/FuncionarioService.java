@@ -1,5 +1,7 @@
 package br.com.hbsis.funcionario;
 
+import br.com.hbsis.fornecedor.Fornecedor;
+import br.com.hbsis.fornecedor.FornecedorDTO;
 import br.com.hbsis.hbemployee.HBEmployeeDTO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,7 +60,11 @@ public class FuncionarioService {
 
         LOGGER.debug("Funcionario: [{}]", funcionarioDTO);
 
-        Funcionario funcionario = new Funcionario(funcionarioDTO.getNome(), funcionarioDTO.getEmail(), this.validaFuncionarioAPI(funcionarioDTO).getEmployeeUuid());
+        Funcionario funcionario = new Funcionario(
+                funcionarioDTO.getNome(),
+                funcionarioDTO.getEmail(),
+                this.validaFuncionarioAPI(funcionarioDTO).getEmployeeUuid()
+        );
 
         funcionario = this.funcionarioRepository.save(funcionario);
 
@@ -94,6 +100,14 @@ public class FuncionarioService {
             e.printStackTrace();
         }
         throw new IllegalArgumentException("Falha ao validar funcionario");
+    }
+
+    public Funcionario converter(FuncionarioDTO funcionarioDTO){
+
+        Funcionario funcionario = new Funcionario();
+
+        funcionario.setId(funcionarioDTO.getId());
+        return funcionario;
     }
 
 }

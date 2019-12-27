@@ -28,7 +28,7 @@ public class FornecedorRest {
     }
 
     @GetMapping("/{Id}")
-    public FornecedorDTO find(@PathVariable("Id") Long Id) {
+    public FornecedorDTO findById(@PathVariable("Id") Long Id) {
         LOGGER.info("Recebendo find by id, Id: [{}]", Id);
 
         return this.fornecedorService.findById(Id);

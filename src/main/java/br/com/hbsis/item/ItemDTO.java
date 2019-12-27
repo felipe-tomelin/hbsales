@@ -15,7 +15,7 @@ public class ItemDTO {
         this.quantidadeProduto = quantidadeProduto;
     }
 
-    public ItemDTO of(Item item){
+    public static ItemDTO of(Item item){
         return new ItemDTO(
                 item.getId(),
                 item.getProduto().getId(),

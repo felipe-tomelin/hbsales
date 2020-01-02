@@ -1,0 +1,1 @@
+ALTER TABLE seg_pedido ADD id_funcionario BIGINT REFERENCES seg_funcionarios(id);

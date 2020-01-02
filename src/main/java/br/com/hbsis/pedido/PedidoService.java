@@ -51,12 +51,24 @@ public class PedidoService {
         this.itemRepository = itemRepository;
     }
 
+    private String codeFormatPedido(String codigo) {
+
+        /*Codigo*/
+        int max = 9999;
+        int min = 1;
+
+        int numberRandom = (int)(Math.random() * ((max - min)+1))+min;
+        String codigoProcessado = String.format("%04d", numberRandom);
+
+        int letraRand = (char)((Math.random() * 90-65) + 1) + 65;
+
+        String codPronto  = (letraRand + codigoProcessado + codigo);
+
+        return codPronto;
+    }
+
     public void validate(PedidoDTO pedidoDTO) {
         LOGGER.info("Validando Pedido");
-
-        if (StringUtils.isEmpty(pedidoDTO.getCodigo())){
-            throw new IllegalArgumentException("Codigo de pedido não deve ser nulo");
-        }
 
         if (StringUtils.isEmpty(pedidoDTO.getStatus())){
             throw new IllegalArgumentException("Status não deve ser nulo");
@@ -84,20 +96,8 @@ public class PedidoService {
 
         Pedido pedido = new Pedido();
 
-        /*Codigo*/
-        int max = 9999;
-        int min = 1;
 
-        String cnpjProcessado = categoriaService.lastFourNumbersFromCNPJ(pedidoDTO.getCodigo());
-
-        int numberRandom = (int)(Math.random() * ((max - min)+1))+min;
-        String codigoProcessado = String.format("%04d", numberRandom);
-
-        int letraRand = (char)((Math.random() * 90-65) + 1) + 65;
-
-        String codPronto = letraRand + codigoProcessado + cnpjProcessado;
-
-        pedido.setCodigo(codPronto.toUpperCase());
+        pedido.setCodigo(codeFormatPedido(pedidoDTO.getCodigo()));
 
         /*Status*/
         pedido.setStatus(pedidoDTO.getStatus().toUpperCase());

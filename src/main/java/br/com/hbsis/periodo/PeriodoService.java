@@ -3,18 +3,14 @@ package br.com.hbsis.periodo;
 import br.com.hbsis.fornecedor.Fornecedor;
 import br.com.hbsis.fornecedor.FornecedorDTO;
 import br.com.hbsis.fornecedor.FornecedorService;
-import freemarker.template.SimpleDate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -49,16 +45,8 @@ public class PeriodoService {
             throw new IllegalArgumentException("Descrição do Periodo de vendas não deve ser nula/vazia");
         }
 
-        if (StringUtils.isEmpty(periodoDTO.getId_fornecedor().toString())) {
+        if (StringUtils.isEmpty(periodoDTO.getIdFornecedor().toString())) {
             throw new IllegalArgumentException("ID de fornecedor não deve ser nulo/vazio");
-        }
-
-        if (periodoDTO.getDataInicio().isBefore(LocalDate.now()) || periodoDTO.getDataFim().isBefore(LocalDate.now()) || periodoDTO.getDataRetirada().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Datas não podem ser anteriores a hoje");
-        }
-
-        if (periodoDTO.getDataInicio().isEqual(periodoDTO.getDataInicio()) && periodoDTO.getDataFim().isEqual(periodoDTO.getDataFim())){
-            throw new IllegalArgumentException("Datas não podem estar ocupando o mesmo periodo");
         }
 
         if (periodoDTO.getDataRetirada().isBefore(periodoDTO.getDataFim())){
@@ -69,6 +57,9 @@ public class PeriodoService {
             throw new IllegalArgumentException("Data do fim não pode ser anterior a data de inicio do periodo");
         }
 
+        validatePeriodoFinalAndStartDate(periodoDTO);
+
+        validateDatasIsBefore(periodoDTO);
     }
 
     public PeriodoDTO save(PeriodoDTO periodoDTO){
@@ -93,13 +84,43 @@ public class PeriodoService {
         periodo.setDescricao(periodoDTO.getDescricao());
 
         /*Id do fornecedor*/
-        FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getId_fornecedor());
+        FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getIdFornecedor());
         Fornecedor fornecedor = converter(fornecedorDTO);
         periodo.setFornecedor(fornecedor);
 
         periodo = this.periodoRepository.save(periodo);
 
         return periodoDTO.of(periodo);
+    }
+
+    private void validateDatasIsBefore(PeriodoDTO periodoDTO) {
+        if (periodoDTO.getDataInicio().isBefore(LocalDate.now()) || periodoDTO.getDataFim().isBefore(LocalDate.now()) || periodoDTO.getDataRetirada().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Datas não podem ser anteriores a hoje");
+        }
+    }
+
+    private void validatePeriodoFinalAndStartDate(PeriodoDTO periodoDTO) {
+
+        List<Periodo> periodoList = this.periodoRepository.findAllByFornecedor_Id(periodoDTO.getIdFornecedor());
+
+        for(Periodo periodo : periodoList){
+
+            if (periodoDTO.getDataInicio().isEqual(periodo.getDataInicio())) {
+                throw new IllegalArgumentException("Periodo já cadastrada com esa data de início.");
+            }
+            if (periodoDTO.getDataInicio().isBefore(periodo.getDataInicio()) && periodoDTO.getDataFim().isAfter(periodo.getDataFim())) {
+                throw new IllegalArgumentException("Caso1");
+            }
+            if (periodoDTO.getDataInicio().isAfter(periodo.getDataInicio()) && periodoDTO.getDataFim().isBefore(periodo.getDataFim())) {
+                throw new IllegalArgumentException("Caso2");
+            }
+            if (periodoDTO.getDataInicio().isBefore(periodo.getDataInicio()) && periodoDTO.getDataFim().isAfter(periodo.getDataInicio())) {
+                throw new IllegalArgumentException("Caso3");
+            }
+            if (periodoDTO.getDataInicio().isBefore(periodo.getDataFim()) && periodoDTO.getDataFim().isAfter(periodo.getDataFim())) {
+                throw new IllegalArgumentException("Caso4");
+            }
+        }
     }
 
     public Fornecedor converter(FornecedorDTO fornecedorDTO){
@@ -139,7 +160,7 @@ public class PeriodoService {
                 periodoExistente.setDataRetirada(periodoDTO.getDataRetirada());
                 periodoExistente.setDescricao(periodoDTO.getDescricao());
 
-                FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getId_fornecedor());
+                FornecedorDTO fornecedorDTO = fornecedorService.findById(periodoDTO.getIdFornecedor());
                 Fornecedor fornecedor = converter(fornecedorDTO);
                 periodoExistente.setFornecedor(fornecedor);
 

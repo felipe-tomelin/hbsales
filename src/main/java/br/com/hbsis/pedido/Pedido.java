@@ -19,9 +19,8 @@ public class Pedido {
     @Column(name = "status")
     private String status;
 
-    @ManyToMany
-    @JoinTable(name = "pedido_item", joinColumns = @JoinColumn(name = "id_pedido", referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "id_item", referencedColumnName = "id"))
+    @OneToMany
+    @JoinColumn(name = "id_pedido", referencedColumnName = "id")
     private List<Item> itemList;
 
     @ManyToOne

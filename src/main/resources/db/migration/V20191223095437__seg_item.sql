@@ -4,3 +4,5 @@ CREATE TABLE seg_item
     id_produto BIGINT REFERENCES seg_produto(id)            NOT NULL,
     quantidade_produto BIGINT                               NOT NULL
 );
+
+

@@ -155,9 +155,9 @@ public class CategoriaService {
         if (categoriaExistenteOptional.isPresent()) {
             Categoria categoriaExistente = categoriaExistenteOptional.get();
 
-            LOGGER.info("Atualizando, br.com.hbsis.categoria... id: [{}]", categoriaExistente.getId());
+            LOGGER.info("Atualizando, br.com.hbsis.categoria... name: [{}]", Categoria.class.getName());
             LOGGER.debug("Payload: {}", categoriaProdutoDTO);
-            LOGGER.debug("Categoria existente: {}", categoriaExistente);
+            LOGGER.debug("Categoria existente: {}", Categoria.class.getName());
 
             categoriaExistente.setNome_categoria(categoriaProdutoDTO.getNome_categoria());
             categoriaExistente.setCodigoCategoria(categoriaProdutoDTO.getCodigoCategoria());

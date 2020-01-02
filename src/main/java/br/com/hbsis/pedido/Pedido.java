@@ -1,6 +1,7 @@
 package br.com.hbsis.pedido;
 
 import br.com.hbsis.fornecedor.Fornecedor;
+import br.com.hbsis.funcionario.Funcionario;
 import br.com.hbsis.item.Item;
 
 import javax.persistence.*;
@@ -19,9 +20,8 @@ public class Pedido {
     @Column(name = "status")
     private String status;
 
-    @ManyToMany
-    @JoinTable(name = "pedido_item", joinColumns = @JoinColumn(name = "id_pedido", referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "id_item", referencedColumnName = "id"))
+    @OneToMany
+    @JoinColumn(name = "id_pedido", referencedColumnName = "id")
     private List<Item> itemList;
 
     @ManyToOne
@@ -32,10 +32,14 @@ public class Pedido {
     @Column(name = "total_value")
     private int totalValue;
 
+    @ManyToOne
+    @JoinColumn(name = "id_funcionario", referencedColumnName = "id")
+    private Funcionario funcionario;
+
     public Pedido() {
     }
 
-    public Pedido(Long id, String codigo, String status, List<Item> itemList, Fornecedor fornecedor, LocalDate dataCriacao, int totalValue) {
+    public Pedido(Long id, String codigo, String status, List<Item> itemList, Fornecedor fornecedor, LocalDate dataCriacao, int totalValue, Funcionario funcionario) {
         this.id = id;
         this.codigo = codigo;
         this.status = status;
@@ -43,6 +47,7 @@ public class Pedido {
         this.fornecedor = fornecedor;
         this.dataCriacao = dataCriacao;
         this.totalValue = totalValue;
+        this.funcionario = funcionario;
     }
 
     public Long getId() {
@@ -101,16 +106,11 @@ public class Pedido {
         this.totalValue = totalValue;
     }
 
-    @Override
-    public String toString() {
-        return "Pedido{" +
-                "id=" + id +
-                ", codigo='" + codigo + '\'' +
-                ", status='" + status + '\'' +
-                ", itemList=" + itemList +
-                ", fornecedor=" + fornecedor +
-                ", dataCriacao=" + dataCriacao +
-                ", totalValue=" + totalValue +
-                '}';
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
     }
 }

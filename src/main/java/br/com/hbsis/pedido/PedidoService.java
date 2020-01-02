@@ -51,11 +51,31 @@ public class PedidoService {
         this.itemRepository = itemRepository;
     }
 
+    private String codeFormatPedido(String codigo) {
+
+        /*Codigo*/
+        int max = 9999;
+        int min = 1;
+
+        int numberRandom = (int)(Math.random() * ((max - min)+1))+min;
+        String codigoProcessado = String.format("%04d", numberRandom);
+
+        int letraRand = (char)((Math.random() * 90-65) + 1) + 65;
+
+        String codPronto  = (letraRand + codigoProcessado + codigo);
+
+        return codPronto;
+    }
+
     public void validate(PedidoDTO pedidoDTO) {
         LOGGER.info("Validando Pedido");
 
+        if (pedidoDTO.getIdFuncionario() == null){
+            throw new IllegalArgumentException("Id de Funcionario não deve ser nulo");
+        }
+
         if (StringUtils.isEmpty(pedidoDTO.getCodigo())){
-            throw new IllegalArgumentException("Codigo de pedido não deve ser nulo");
+            throw new IllegalArgumentException("Codigo não deve ser nulo");
         }
 
         if (StringUtils.isEmpty(pedidoDTO.getStatus())){
@@ -84,20 +104,7 @@ public class PedidoService {
 
         Pedido pedido = new Pedido();
 
-        /*Codigo*/
-        int max = 9999;
-        int min = 1;
-
-        String cnpjProcessado = categoriaService.lastFourNumbersFromCNPJ(pedidoDTO.getCodigo());
-
-        int numberRandom = (int)(Math.random() * ((max - min)+1))+min;
-        String codigoProcessado = String.format("%04d", numberRandom);
-
-        int letraRand = (char)((Math.random() * 90-65) + 1) + 65;
-
-        String codPronto = letraRand + codigoProcessado + cnpjProcessado;
-
-        pedido.setCodigo(codPronto.toUpperCase());
+        pedido.setCodigo(codeFormatPedido(pedidoDTO.getCodigo()));
 
         /*Status*/
         pedido.setStatus(pedidoDTO.getStatus().toUpperCase());
@@ -105,16 +112,23 @@ public class PedidoService {
         /*Data Criação*/
         pedido.setDataCriacao(pedidoDTO.getDataCriacao());
 
+        /*Id funcionario*/
+        FuncionarioDTO idFuncionario = funcionarioService.findById(pedidoDTO.getIdFuncionario());
+        Funcionario funcionario1 = funcionarioService.converter(idFuncionario);
+        pedido.setFuncionario(funcionario1);
+
         /*Id do fornecedor*/
         FornecedorDTO idFornecedor = fornecedorService.findById(pedidoDTO.getIdFornecedor());
         Fornecedor fornecedor = categoriaService.converter(idFornecedor);
         pedido.setFornecedor(fornecedor);
 
+        pedido = this.pedidoRepository.save(pedido);
+
         /*Lista de Itens*/
-        pedido.setItemList(saveItems(pedidoDTO.getItemDTOList()));
+        pedido.setItemList(saveItems(pedidoDTO.getItemDTOList(), pedido));
 
         /*Validação na API*/
-        FuncionarioDTO funcionarioDTO = this.funcionarioService.findById(pedidoDTO.getId());
+        FuncionarioDTO funcionarioDTO = this.funcionarioService.findById(pedidoDTO.getIdFuncionario());
         Funcionario funcionario = funcionarioService.converter(funcionarioDTO);
 
         InvoiceDTO invoiceDTO = new InvoiceDTO(
@@ -126,8 +140,6 @@ public class PedidoService {
 
         this.APIHBemployeeNotificar(invoiceDTO);
 
-        pedido = this.pedidoRepository.save(pedido);
-
         return pedidoDTO.of(pedido);
     }
 
@@ -136,17 +148,16 @@ public class PedidoService {
         List<Pedido> pedidoList = this.pedidoRepository.
     }*/
 
-    public List<Item> saveItems(List<ItemDTO> itemDTOList) {
+    public List<Item> saveItems(List<ItemDTO> itemDTOList, Pedido pedido) {
         LOGGER.info("Salvando itens");
         List<Item> itemList = new ArrayList<>();
 
         for(ItemDTO itemDTO : itemDTOList) {
-            Item item = new Item(this.produtoService.findById(itemDTO.getIdProduto()), itemDTO.getQuantidadeProduto());
+            Item item = new Item(this.produtoService.findById(itemDTO.getIdProduto()), itemDTO.getQuantidadeProduto(), pedido);
             itemList.add(item);
         }
         return this.itemRepository.saveAll(itemList);
     }
-
 
     public Pedido findById(Long id){
         Optional<Pedido> pedidoOptional = this.pedidoRepository.findById(id);
@@ -211,9 +222,9 @@ public class PedidoService {
 
             HttpEntity<InvoiceDTO> httpEntityFun = new HttpEntity<>(invoiceDTO, httpHeaders);
 
-            return this.restTemplate.postForEntity("http://10.2.54.25:9999/api/invoice", httpEntityFun, InvoiceDTO.class);
+            return this.restTemplate.postForEntity("http://10.2.54.25:9999/v2/api-docs", httpEntityFun, InvoiceDTO.class);
         }catch (Exception e){
-            e.printStackTrace();
+           LOGGER.error("DEU ERRO: "+e.getMessage());
             throw new IllegalArgumentException("Falha ao notificar a API HBEmployee sobre pedido");
         }
     }

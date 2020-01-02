@@ -14,12 +14,13 @@ public class PedidoDTO {
     private Long idFornecedor;
     private LocalDate dataCriacao;
     private List<ItemDTO> itemDTOList;
+    private Long idFuncionario;
     private int totalValue;
 
     public PedidoDTO() {
     }
 
-    public PedidoDTO(Long id, String codigo, String status, Long idFornecedor, LocalDate dataCriacao, List<ItemDTO> itemDTOList, int totalValue) {
+    public PedidoDTO(Long id, String codigo, String status, Long idFornecedor, LocalDate dataCriacao, List<ItemDTO> itemDTOList, int totalValue, Long idFuncionario) {
         this.id = id;
         this.codigo = codigo;
         this.status = status;
@@ -27,6 +28,7 @@ public class PedidoDTO {
         this.dataCriacao = dataCriacao;
         this.itemDTOList = itemDTOList;
         this.totalValue = totalValue;
+        this.idFuncionario = idFuncionario;
     }
 
     public static PedidoDTO of(Pedido pedido){
@@ -40,7 +42,8 @@ public class PedidoDTO {
                 pedido.getFornecedor().getId(),
                 pedido.getDataCriacao(),
                 itemDTOList,
-                pedido.getTotalValue()
+                pedido.getTotalValue(),
+                pedido.getFuncionario().getId()
         );
     }
 
@@ -100,6 +103,14 @@ public class PedidoDTO {
         this.totalValue = totalValue;
     }
 
+    public Long getIdFuncionario() {
+        return idFuncionario;
+    }
+
+    public void setIdFuncionario(Long idFuncionario) {
+        this.idFuncionario = idFuncionario;
+    }
+
     @Override
     public String toString() {
         return "PedidoDTO{" +
@@ -109,6 +120,7 @@ public class PedidoDTO {
                 ", idFornecedor=" + idFornecedor +
                 ", dataCriacao=" + dataCriacao +
                 ", itemDTOList=" + itemDTOList +
+                ", idFuncionario=" + idFuncionario +
                 ", totalValue=" + totalValue +
                 '}';
     }

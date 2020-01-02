@@ -8,18 +8,18 @@ public class PeriodoDTO {
     private LocalDate dataFim;
     private LocalDate dataRetirada;
     private String descricao;
-    private Long id_fornecedor;
+    private Long idFornecedor;
 
     public PeriodoDTO(){
     }
 
-    public PeriodoDTO(Long id, LocalDate dataInicio, LocalDate dataFim, LocalDate dataRetirada, String descricao, Long id_fornecedor) {
+    public PeriodoDTO(Long id, LocalDate dataInicio, LocalDate dataFim, LocalDate dataRetirada, String descricao, Long idFornecedor) {
         this.id = id;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.dataRetirada = dataRetirada;
         this.descricao = descricao;
-        this.id_fornecedor = id_fornecedor;
+        this.idFornecedor = idFornecedor;
     }
 
     public static PeriodoDTO of(Periodo periodo){
@@ -73,12 +73,12 @@ public class PeriodoDTO {
         this.descricao = descricao;
     }
 
-    public Long getId_fornecedor() {
-        return id_fornecedor;
+    public Long getIdFornecedor() {
+        return idFornecedor;
     }
 
-    public void setId_fornecedor(Long id_fornecedor) {
-        this.id_fornecedor = id_fornecedor;
+    public void setIdFornecedor(Long idFornecedor) {
+        this.idFornecedor = idFornecedor;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class PeriodoDTO {
                 ", dataFim=" + dataFim +
                 ", dataRetirada=" + dataRetirada +
                 ", descricao='" + descricao + '\'' +
-                ", id_fornecedor=" + id_fornecedor +
+                ", idFornecedor=" + idFornecedor +
                 '}';
     }
 }

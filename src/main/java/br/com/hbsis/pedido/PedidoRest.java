@@ -26,7 +26,7 @@ public class PedidoRest {
     }
 
     @GetMapping("/{id}")
-    public PedidoDTO findById(@PathVariable("id") Long id){
+    public Pedido findById(@PathVariable("id") Long id){
         LOGGER.info("Recebendo find by id, ID: {}", id);
 
         return this.pedidoService.findById(id);
